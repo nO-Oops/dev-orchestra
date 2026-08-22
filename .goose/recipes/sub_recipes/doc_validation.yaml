@@ -1,0 +1,73 @@
+version: 1.0.0
+title: Documentation Validation
+description: Validation de la documentation mise à jour
+
+instruction: |
+  Valider la cohérence et la qualité de la documentation.
+
+prompt: |
+  Valider la documentation mise à jour.
+
+  -- Étape 1 - Vérification de la cohérence
+
+  Vérifier que :
+  - La documentation reflète le code actuel
+  - Les exemples fonctionnent
+  - Les commandes sont correctes
+  - Les liens sont valides
+
+  -- Étape 2 - Vérification de la complétude
+
+  Vérifier que :
+  - Tous les changements sont documentés
+  - Les nouvelles fonctionnalités sont décrites
+  - Les changements d'API sont documentés
+  - Le CHANGELOG est à jour
+
+  -- Étape 3 - Vérification du formatage
+
+  Vérifier que :
+  - Le Markdown est bien formaté
+  - Les tableaux sont alignés
+  - Les codes sont dans des blocs appropriés
+  - Les titres sont hiérarchisés correctement
+
+  -- Étape 4 - Vérification de la clarté
+
+  Vérifier que :
+  - Le langage est clair et concis
+  - Pas de jargon non expliqué
+  - Les instructions sont actionnables
+  - La structure est logique
+
+  -- Livrables
+
+  Produire un rapport de validation :
+
+  ```markdown
+  # Rapport de Validation de la Documentation
+
+  ## Résumé
+  - **Cohérence** : <OK / Problèmes>
+  - **Complétude** : <OK / Problèmes>
+  - **Formatage** : <OK / Problèmes>
+  - **Clarté** : <OK / Problèmes>
+
+  ## Problèmes Identifiés
+  | # | Fichier | Type | Description | Sévérité |
+  |---|---------|------|-------------|----------|
+  | 1 | <fichier> | <type> | <description> | <haute/moyenne/basse> |
+
+  ## Points Positifs
+  - <point 1>
+  - <point 2>
+
+  ## Recommandations
+  1. <recommandation 1>
+  2. <recommandation 2>
+
+  ## Prêt pour commit
+  - [ ] Oui / Non
+  ```
+
+  Ce rapport sera utilisé pour décider si le commit peut être effectué.

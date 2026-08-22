@@ -1,0 +1,108 @@
+version: 1.0.0
+title: Fix Documentation
+description: |
+  Génération du rapport de correction de bug.
+  Documente la cause racine, la solution appliquée, les fichiers modifiés, les tests ajoutés et les recommandations.
+
+instruction: |
+  Générer un rapport de correction complet et structuré.
+
+  Objectifs :
+  - Documenter la cause racine identifiée
+  - Décrire la solution appliquée
+  - Lister les fichiers modifiés et les tests ajoutés
+  - Documenter la validation effectuée
+  - Formuler des recommandations pour éviter des bugs similaires
+
+  Contraintes :
+  - Ne jamais modifier les fichiers de l'application
+  - Créer le rapport dans `docs/rapports/<task_name_slug>-<current_sub_recipe_name>-<aaaaMMjj>.md`
+  - Utiliser les informations des sous-recettes précédentes (code_bug_analysis, code_fix_design, code_fix_implementation, task_validation)
+  - Produire un rapport clair et actionnable
+
+prompt: |
+  Générer le rapport de correction de bug.
+
+  -- Étape 1 - Collecte des informations
+
+  Récupérer les données des sous-recettes précédentes :
+  - **bug_analysis** : Cause racine, impact, scénarios de reproduction
+  - **fix_design** : Approche sélectionnée, justification, plan d'implémentation
+  - **fix_implementation** : Fichiers modifiés, tests ajoutés, vérification locale
+  - **validation** : Résultats des tests, métriques, statut de validation
+
+  -- Étape 2 - Création du rapport
+
+  Créer le fichier `.goose/reports/fix-<task_name_slug>.md` avec le template suivant :
+
+  ```markdown
+  # Rapport de Correction de Bug
+
+  ## Informations
+  - **Task** : <task_name>
+  - **Branche** : fix/<task_name_slug>
+  - **Date** : <date de création du rapport>
+  - **Auteur** : Goose AI
+
+  ## Problème
+  - **Description** : <description du bug observé>
+  - **Comportement attendu** : <ce qui aurait dû se passer>
+  - **Fréquence** : <100% / Aléatoire / Occasionnel>
+  - **Impact** : <Critique / Majeur / Mineur>
+
+  ## Cause Racine
+  - **Cause directe** : <description de la cause immédiate>
+  - **Cause profonde** : <explication de pourquoi la cause existe>
+  - **Facteurs contributifs** : <liste des facteurs qui ont aggravé le problème>
+
+  ## Solution
+  - **Approche sélectionnée** : <nom de l'approche de fix_design>
+  - **Justification** : <pourquoi cette approche a été choisie>
+  - **Description technique** : <description de la correction appliquée>
+
+  ## Fichiers Modifiés
+  | Fichier | Type de modification | Lignes +/- | Description |
+  |---------|---------------------|------------|-------------|
+  | <fichier> | <ajout/modif/suppr> | <+n/-m> | <détail> |
+
+  ## Tests
+  - **Tests ajoutés** : <nombre>
+  - **Tests modifiés** : <nombre>
+  - **Couverture estimée** : <pourcentage>%
+
+  ### Tests ajoutés
+  | # | Fichier | Nom du test | Couvre |
+  |---|---------|-------------|--------|
+  | 1 | <fichier> | <nom> | <scénario> |
+
+  ### Tests modifiés
+  | # | Fichier | Nom du test | Raison de la modification |
+  |---|---------|-------------|--------------------------|
+  | 1 | <fichier> | <nom> | <raison> |
+
+  ## Validation
+  - **Build** : <Réussi / Échoué>
+  - **Linting** : <OK / Erreurs>
+  - **Tests unitaires** : <n>/<total> passés
+  - **Tests d'intégration** : <n>/<total> passés (si applicable)
+  - **Scénario de reproduction** : <Corrigé / Non vérifié>
+
+  ## Impact
+  - **Utilisateurs** : <nombre/type d'utilisateurs impactés>
+  - **Données** : <type d'impact sur les données>
+  - **Système** : <impact sur la performance/disponibilité>
+  - **Business** : <impact métier>
+
+  ## Recommandations
+  1. <recommandation 1 : pour éviter des bugs similaires>
+  2. <recommandation 2>
+  3. <recommandation 3>
+
+  ## Points d'attention
+  - <point 1 : risque résiduel ou limitation>
+  - <point 2>
+
+  ## Liens
+  - **Task source** : `.goose/prompts/03-to_validate/<task_file>`
+  - **Branche** : `fix/<task_name_slug>`
+  - **Pull Request** : <lien si disponible>

@@ -1,0 +1,63 @@
+version: 1.0.0
+title: Inline Documentation Update
+description: Mise à jour de la documentation inline
+
+instruction: |
+  Mettre à jour les docstrings et commentaires du code.
+
+prompt: |
+  Mettre à jour la documentation inline.
+
+  -- Étape 1 - Identification des fichiers concernés
+
+  Selon le plan de documentation, identifier :
+  - Les fichiers de code avec fonctions modifiées
+  - Les fichiers de code avec nouvelles fonctions
+
+  -- Étape 2 - Mise à jour des docstrings
+
+  Pour chaque fonction/méthode modifiée ou ajoutée :
+
+  Structure recommandée (ex: Python) :
+  ```python
+  def fonction(param1, param2):
+      """Description courte.
+
+      Description longue si nécessaire.
+
+      Args:
+          param1: Description du paramètre
+          param2: Description du paramètre
+
+      Returns:
+          Description de la valeur retournée
+
+      Raises:
+          ExceptionType: Description de quand cette exception est levée
+
+      Examples:
+          >>> fonction(valeur1, valeur2)
+          resultat
+      """
+  ```
+
+  Règles :
+  - **Nommage** : Utiliser les mêmes conventions que le projet
+  - **Clarté** : Expliquer le "pourquoi" si non évident
+  - **Exemples** : Ajouter si la fonction est complexe
+  - **Exceptions** : Lister toutes les exceptions possibles
+
+  -- Étape 3 - Validation
+
+  Vérifier :
+  - [ ] Toutes les fonctions publiques ont une docstring
+  - [ ] Les paramètres sont documentés
+  - [ ] La valeur de retour est documentée
+  - [ ] Les exemples fonctionnent (si présents)
+
+  -- Livrables
+
+  Confirmer :
+  - **Fichiers modifiés** : <liste>
+  - **Docstrings mises à jour** : <nombre>
+  - **Nouvelles docstrings** : <nombre>

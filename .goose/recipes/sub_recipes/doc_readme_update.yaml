@@ -1,0 +1,47 @@
+version: 1.0.0
+title: README Update
+description: Mise à jour du README
+
+instruction: |
+  Mettre à jour le README.md en fonction des changements.
+
+prompt: |
+  Mettre à jour le README.md.
+
+  -- Étape 1 - Lecture du README existant
+
+  Lire le contenu actuel du README.md pour comprendre sa structure.
+
+  -- Étape 2 - Identification des sections à mettre à jour
+
+  Selon le plan de documentation :
+  - **Description** : Mettre à jour si nouvelles fonctionnalités majeures
+  - **Installation** : Vérifier que les commandes sont correctes
+  - **Utilisation** : Ajouter des exemples pour nouvelles fonctionnalités
+  - **Configuration** : Mettre à jour si changements de config
+  - **API** : Ajouter les nouvelles endpoints/fonctions
+  - **Contribuer** : Vérifier que les instructions sont à jour
+
+  -- Étape 3 - Mise à jour
+
+  Apporter les modifications :
+  - Ajouter les nouvelles fonctionnalités dans la description
+  - Mettre à jour les exemples d'utilisation
+  - Ajouter les nouvelles commandes si nécessaire
+  - Vérifier que tous les liens sont valides
+
+  -- Étape 4 - Validation
+
+  Vérifier :
+  - [ ] La description reflète l'état actuel du projet
+  - [ ] Les exemples d'utilisation fonctionnent
+  - [ ] Les commandes d'installation sont correctes
+  - [ ] Pas de liens cassés
+  - [ ] Le formatage est cohérent
+
+  -- Livrables
+
+  Confirmer :
+  - **Fichier modifié** : README.md
+  - **Sections mises à jour** : <liste>
+  - **Lignes ajoutées/supprimées** : <+n/-m>

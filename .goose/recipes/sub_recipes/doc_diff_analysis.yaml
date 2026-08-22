@@ -1,0 +1,66 @@
+title: Diff Analysis
+description: Analyse des différences pour identifier les changements
+
+instruction: |
+  Analyser les différences entre la branche actuelle et la cible.
+
+prompt: |
+  Analyser les différences entre la branche actuelle et la branche cible.
+
+  -- Étape 1 - Récupération du diff
+
+  Exécuter :
+  ```bash
+  git diff origin/<branche_cible>...HEAD --stat
+  git diff origin/<branche_cible>...HEAD
+  ```
+
+  -- Étape 2 - Classification des fichiers
+
+  Pour chaque fichier modifié, classifier :
+  - **Code source** (*.py, *.js, *.ts, *.java, *.rs, etc.)
+  - **Tests** (*_test.*, test_*, *)
+  - **Documentation** (*.md, *.rst, *.txt)
+  - **Configuration** (*.yaml, *.json, *.toml, *.config)
+  - **Scripts** (*.sh, *.bash)
+  - **Autre**
+
+  -- Étape 3 - Analyse des changements
+
+  Pour chaque fichier de code modifié :
+  - Lister les fonctions/méthodes ajoutées
+  - Lister les fonctions/méthodes modifiées
+  - Lister les fonctions/méthodes supprimées
+  - Identifier les changements d'API publique
+  - Identifier les nouvelles dépendances
+
+  -- Étape 4 - Résumé des changements
+
+  Produire un résumé structuré :
+
+  ```markdown
+  # Analyse des Différences
+
+  ## Résumé
+  - **Fichiers modifiés** : <nombre>
+  - **Lignes ajoutées** : <nombre>
+  - **Lignes supprimées** : <nombre>
+
+  ## Fichiers par Catégorie
+  | Catégorie | Nombre | Fichiers |
+  |-----------|--------|----------|
+  | Code source | <n> | <liste> |
+  | Tests | <n> | <liste> |
+  | Documentation | <n> | <liste> |
+  | Configuration | <n> | <liste> |
+
+  ## Changements d'API
+  - **Fonctions ajoutées** : <liste>
+  - **Fonctions modifiées** : <liste>
+  - **Fonctions supprimées** : <liste>
+
+  ## Nouvelles Dépendances
+  - <liste ou "Aucune">
+  ```
+
+  Ce résumé sera utilisé par `doc_identification` pour déterminer ce qui doit être documenté.

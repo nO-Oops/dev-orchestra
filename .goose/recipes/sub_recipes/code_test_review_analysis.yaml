@@ -1,0 +1,133 @@
+version: 1.0.0
+title: Test Review Analysis
+description: |
+  Analyse de la qualité et de la couverture des tests dans la pull request.
+  Vérifie la pertinence, la complétude et la robustesse des tests.
+
+instruction: |
+  Analyser les tests associés aux modifications de la pull request.
+
+  Objectifs :
+  - Vérifier que tous les cas fonctionnels sont testés
+  - Évaluer la qualité des assertions et des mocks
+  - Identifier les cas edge cases manquants
+  - S'assurer que les tests sont isolés et reproductibles
+  - Vérifier la couverture des nouveaux fonctionnalités
+
+  Contraintes :
+  - Ne jamais modifier les fichiers de l'application
+  - Se concentrer uniquement sur les fichiers de tests modifiés/ajoutés
+  - Produire des findings actionnables avec des suggestions
+
+prompt: |
+  Analyser les tests dans la pull request.
+
+  -- Étape 1 - Inventaire des tests
+
+  Pour chaque fichier de test modifié/ajouté :
+  - Lister les tests ajoutés
+  - Lister les tests modifiés
+  - Identifier les tests supprimés (et justifier)
+  - Calculer le ratio tests ajoutés / code ajouté
+
+  -- Étape 2 - Couverture fonctionnelle
+
+  Vérifier que les tests couvrent :
+  - **Cas heureux** (Happy Path) : Le scénario normal fonctionne
+  - **Cas malheureux** (Sad Path) : Gestion des erreurs
+  - **Cas edge** : Valeurs limites, données vides, types incorrects
+  - **Cas d'erreur** : Exceptions levées correctement
+  - **Cas de sécurité** : Injection, authentification, autorisation
+
+  Pour chaque fonctionnalité modifiée, vérifier :
+  - [ ] Test du comportement normal
+  - [ ] Test des erreurs/exceptions
+  - [ ] Test des valeurs limites
+  - [ ] Test des cas d'usage alternatifs
+
+  -- Étape 3 - Qualité des tests
+
+  Évaluer la qualité de chaque test :
+  - **Nom significatif** : Le nom décrit le scénario testé
+  - **Assertion claire** : L'assertion vérifie bien le comportement attendu
+  - **Setup approprié** : Les données de test sont réalistes
+  - **Isolation** : Le test ne dépend pas d'autres tests
+  - **Reproductibilité** : Le test passe toujours dans les mêmes conditions
+  - **Pas de side effects** : Pas de modifications d'état global
+
+  -- Étape 4 - Mocks et Stubs
+
+  Analyser l'utilisation des mocks :
+  - **Mocks nécessaires** : Les dépendances externes sont mockées correctement
+  - **Pas de sur-mocking** : Pas de mock inutile pour du code simple
+  - **Vérification des appels** : Les interactions sont vérifiées si nécessaire
+  - **Données réalistes** : Les mocks retournent des valeurs plausibles
+  - **Pas de mock du SUT** : Le système testé n'est pas mocké
+
+  -- Étape 5 - Couverture de code
+
+  Estimer la couverture des tests :
+  - **Lignes couvertes** : Pourcentage de lignes de code testées
+  - **Branches couvertes** : Pourcentage de branches conditionnelles testées
+  - **Nouvelles fonctionnalités** : 100% de couverture sur le code ajouté
+  - **Code existant** : Pas de régression sur le code modifié
+
+  -- Étape 6 - Tests existants
+
+  Vérifier l'impact sur les tests existants :
+  - **Tests cassés** : Y a-t-il des tests qui échouent ?
+  - **Tests obsolètes** : Des tests ne couvrent plus rien ?
+  - **Tests à mettre à jour** : Des tests doivent être adaptés ?
+  - **Nouveaux tests nécessaires** : Des cas non couverts identifiés ?
+
+  -- Étape 7 - Bonnes pratiques
+
+  Vérifier l'application des bonnes pratiques :
+  - **AAA Pattern** (Arrange-Act-Assert) : Structure claire des tests
+  - **Données de test** : Utilisation de fixtures ou factories
+  - **Pas de code durci** : Pas de valeurs en dur dans les assertions
+  - **Tests indépendants** : Ordre d'exécution non critique
+  - **Temps d'exécution** : Tests rapides (< 1s par test unitaire)
+
+  -- Livrables
+
+  Produire un rapport structuré :
+
+  ```markdown
+  # Analyse des Tests
+
+  ## Résumé
+  - **Score global** : <Excellent/Bon/Moyen/À améliorer/Critique>
+  - **Tests ajoutés** : <nombre>
+  - **Tests modifiés** : <nombre>
+  - **Tests supprimés** : <nombre>
+  - **Couverture estimée** : <pourcentage>%
+  - **Cas edge couverts** : <nombre>/<total>
+
+  ## Tests Ajoutés
+  | # | Fichier | Nom du test | Type | Pertinence |
+  |---|---------|-------------|------|------------|
+  | 1 | <fichier> | <nom> | <unitaire/intégration> | <Haute/Moyenne/Faible> |
+
+  ## Tests Modifiés
+  | # | Fichier | Nom du test | Raison de la modification |
+  |---|---------|-------------|--------------------------|
+  | 1 | <fichier> | <nom> | <raison> |
+
+  ## Cas Edge Manquants
+  | # | Fichier/Fonctionnalité | Cas edge | Priorité |
+  |---|------------------------|----------|----------|
+  | 1 | <module> | <description> | <Haute/Moyenne/Basse> |
+
+  ## Problèmes Identifiés
+  | # | Fichier | Type | Description | Suggestion |
+  |---|---------|------|-------------|------------|
+  | 1 | <fichier> | <type> | <description> | <suggestion> |
+
+  ## Points Positifs
+  - <point 1>
+  - <point 2>
+
+  ## Recommandations
+  1. <recommandation 1>
+  2. <recommandation 2>

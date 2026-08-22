@@ -1,0 +1,26 @@
+version: 1.0.0
+title: Feature Design
+description: Conception de l'implémentation avec justification
+
+instruction: |
+  Concevoir l'approche d'implémentation en présentant plusieurs options.
+
+prompt: |
+  Présenter les approches d'implémentation possibles :
+
+  Pour chaque approche :
+  - Décrire l'approche
+  - Lister les avantages
+  - Lister les inconvénients
+
+  Sélectionner l'approche optimale et justifier le choix en fonction de :
+  - Minimalité des modifications
+  - Maintenabilité
+  - Performance
+  - Compatibilité avec l'architecture existante
+
+  Produire un document de conception incluant :
+  - Approches évaluées
+  - Approche sélectionnée
+  - Justification
+  - Plan d'exécution détaillé

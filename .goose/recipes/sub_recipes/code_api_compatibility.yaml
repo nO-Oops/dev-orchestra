@@ -1,0 +1,101 @@
+version: 1.0.0
+title: API Compatibility Analysis
+description: |
+  Analyse de la compatibilité API dans la pull request.
+  Vérifie les changements cassants, la rétrocompatibilité,
+  le versioning, la documentation et l'impact sur les consommateurs.
+
+instruction: |
+  Analyser les modifications affectant les interfaces publiques de l'application.
+
+  Objectifs :
+  - Identifier tous les changements d'API (endpoints, fonctions publiques, schémas de données, configs)
+  - Classifier la nature des changements (cassant, mineur, correctif, dépréciation)
+  - Vérifier le respect de la stratégie de versioning et de rétrocompatibilité
+  - Évaluer l'impact sur les consommateurs internes et externes
+  - S'assurer que la documentation et les guides de migration sont à jour
+
+  Contraintes :
+  - Ne jamais modifier les fichiers de l'application
+  - Se concentrer uniquement sur les interfaces publiques exposées
+  - Produire des findings actionnables avec des suggestions de correction ou de migration
+
+prompt: |
+  Analyser la compatibilité API dans la pull request.
+
+  -- Étape 1 - Inventaire des changements API
+
+  Pour chaque fichier modifié, identifier les interfaces publiques touchées :
+  - **Endpoints HTTP** (routes, contrôleurs, middlewares)
+  - **Signatures de fonctions/classes** (paramètres, types, retours)
+  - **Schémas de données** (DTOs, modèles, payloads, headers)
+  - **Configuration externe** (variables d'environnement, fichiers de config exposés)
+  - **Contrats de communication** (gRPC, GraphQL, messages asynchrones, événements)
+
+  -- Étape 2 - Classification des changements
+
+  Classifier chaque modification selon l'impact sur les consommateurs :
+  - **Breaking Change (Major)** : Suppression de champs/endpoints, changement de type incompatible, modification du comportement par défaut, changement de code d'erreur
+  - **Non-Breaking (Minor)** : Ajout de champs/endpoints optionnels, nouveaux paramètres facultatifs, enrichissement de réponses
+  - **Correctif (Patch)** : Correction de bugs, amélioration de performance sans changement de contrat
+  - **Dépréciation** : Marquage d'anciens comportements comme obsolètes avec une date de fin de support
+
+  -- Étape 3 - Vérification de la rétrocompatibilité
+
+  Pour chaque changement identifié :
+  - Vérifier que les anciens clients peuvent toujours communiquer sans modification
+  - Confirmer que les champs supprimés sont soit dépréciés, soit remplacés
+  - S'assurer que les nouveaux champs sont optionnels ou ont des valeurs par défaut sûres
+  - Valider que les codes de statut HTTP et les formats d'erreur restent cohérents
+  - Vérifier l'absence de breaking changes dans les payloads JSON/XML/Protobuf
+
+  -- Étape 4 - Stratégie de versioning & dépréciation
+
+  Vérifier le respect des conventions du projet :
+  - **Versioning** : Respect du Semantic Versioning (MAJOR.MINOR.PATCH)
+  - **Headers/URL** : Utilisation correcte des headers `X-API-Version` ou `/v2/` si applicable
+  - **Dépréciation** : Utilisation de `@deprecated`, `X-Deprecation-Header`, ou logs de warning
+  - **Période de support** : Respect de la politique de dépréciation (ex: 2 versions minimum)
+  - **Fallbacks** : Présence de mécanismes de fallback pour les anciens clients
+
+  -- Étape 5 - Impact sur les consommateurs & documentation
+
+  Évaluer l'impact et la traçabilité :
+  - **Documentation** : OpenAPI/Swagger, README, exemples d'utilisation mis à jour
+  - **Migration Guide** : Guide de migration disponible pour les breaking changes
+  - **Clients internes/externes** : Liste des services ou équipes impactés
+  - **Tests de compatibilité** : Tests de régression API existants ou nouveaux
+  - **Changelog** : Entrée ajoutée dans le CHANGELOG.md
+
+  -- Étape 6 - Livrables
+
+  Produire un rapport structuré :
+
+  ```markdown
+  # Analyse de Compatibilité API
+
+  ## Résumé
+  - **Score global** : <Excellent/Bon/Moyen/À améliorer/Critique>
+  - **Changements identifiés** : <nombre>
+  - **Breaking Changes** : <nombre>
+  - **Dépréciations** : <nombre>
+  - **Documentation à jour** : <Oui/Non>
+  - **Guide de migration** : <Disponible/Non requis/Manquant>
+
+  ## Tableau des Changements
+  | # | Interface | Type de changement | Impact | Compatibilité |
+  |---|-----------|-------------------|--------|---------------|
+  | 1 | <endpoint/fonction> | <Breaking/Minor/Patch/Deprecation> | <Haute/Moyenne/Faible> | <Rétrocompatible/Non compatible> |
+
+  ## Breaking Changes Détailés
+  | # | Interface | Modification | Conséquence | Action requise |
+  |---|-----------|--------------|-------------|----------------|
+  | 1 | <interface> | <description> | <impact> | <correction/migration> |
+
+  ## Points Positifs
+  - <point 1>
+  - <point 2>
+
+  ## Recommandations
+  1. <recommandation 1>
+  2. <recommandation 2>

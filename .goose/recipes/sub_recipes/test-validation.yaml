@@ -1,0 +1,96 @@
+version: 1.0.0
+title: Test Validation
+description: Validation de chaque test ajouté
+
+instruction: |
+  Valider chaque test généré individuellement.
+  Il faut adapter les con=mmandes d'exécution de tests au langages utilisés
+
+prompt: |
+  Valider chaque test généré individuellement.
+
+  -- Étape 1 - Exécution individuelle
+
+  Pour chaque test généré :
+  ```bash
+  pytest <fichier>::<nom_du_test> -v
+  ```
+
+  Vérifier :
+  - Le test passe (PASSED)
+  - Le temps d'exécution est raisonnable (< 1s pour unitaire)
+  - Pas de warnings ou errors
+
+  -- Étape 2 - Vérification de l'isolation
+
+  Pour chaque test :
+  - Exécuter le test seul (sans les autres tests)
+  - Confirmer qu'il passe toujours
+  - Vérifier qu'il ne modifie pas l'état global
+
+  -- Étape 3 - Vérification des assertions
+
+  Pour chaque test :
+  - Lire les assertions
+  - Confirmer qu'elles vérifient bien le comportement attendu
+  - Vérifier qu'elles ne sont pas trop permissives ou trop strictes
+
+  -- Étape 4 - Exécution de la suite complète
+
+  Lancer tous les tests (anciens + nouveaux) :
+  ```bash
+  pytest -v
+  ```
+
+  Vérifier :
+  - Tous les tests passent (ancien + nouveau)
+  - Pas de régression sur les tests existants
+  - Temps d'exécution total acceptable
+
+  -- Étape 5 - Génération de la nouvelle couverture
+
+  Lancer les tests avec couverture :
+  ```bash
+  coverage run -m pytest
+  coverage report -m
+  ```
+
+  Extraire :
+  - **Nouvelle couverture globale**
+  - **Couverture par fichier**
+  - **Amélioration par module**
+
+  -- Livrables
+
+  Produire un rapport de validation :
+
+  ```markdown
+  # Rapport de Validation des Tests
+
+  ## Résumé
+  - **Tests validés** : <n>/<total>
+  - **Tests échoués** : <nombre> (si > 0, arrêter)
+  - **Couverture avant** : <pourcentage>%
+  - **Couverture après** : <pourcentage>%
+  - **Amélioration** : <+n points de pourcentage>
+
+  ## Validation Individuelle
+  | # | Test | Statut | Temps | Isolation |
+  |---|------|--------|-------|-----------|
+  | 1 | <nom> | PASSED | <n>s | OK |
+
+  ## Régression
+  - **Tests existants** : <n>/<total> passent
+  - **Nouveaux tests** : <n>/<total> passent
+  - **Temps total** : <n>s
+
+  ## Couverture
+  | Module | Avant | Après | Amélioration |
+  |--------|-------|-------|--------------|
+  | <module> | <n>% | <n>% | <+n>% |
+
+  ## Prêt pour commit
+  - [ ] Oui / Non
+  ```
+
+  Ce rapport sera utilisé par `test_coverage_report` pour le rapport final.

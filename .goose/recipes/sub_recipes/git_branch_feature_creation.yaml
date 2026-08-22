@@ -1,0 +1,21 @@
+version: 1.0.0
+title: Branch Creation
+description: Création de la branche feature avec vérification
+
+instruction: |
+  Créer une branche feature avec un nom sécurisé et vérifier sa création.
+
+prompt: |
+  Générer un nom de branche sécurisé :
+
+  Règles de génération :
+  - Tout en minuscules
+  - Remplacer les espaces par "-"
+  - Remplacer les caractères spéciaux
+  - Ajouter la date au format aaaaMMjj
+
+  Nom de branche : `feature/<task_name_slug>`
+
+  Exécuter :
+  ```bash
+  git checkout -b feature/<task_name_slug>

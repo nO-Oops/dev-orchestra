@@ -1,0 +1,77 @@
+version: 1.0.0
+title: Coverage Analysis
+description: Analyse de la couverture des tests existants
+
+instruction: |
+  Analyser la couverture des tests existants.
+
+prompt: |
+  Analyser la couverture des tests existants.
+
+  -- Étape 1 - Exécution avec couverture
+
+  Lancer les tests avec génération du rapport de couverture :
+
+  Pour Python :
+  ```bash
+  coverage run -m pytest
+  coverage report -m
+  coverage html
+  ```
+
+  Pour JavaScript/TypeScript :
+  ```bash
+  npx jest --coverage
+  ```
+
+  Pour Java :
+  ```bash
+  mvn test
+  mvn jacoco:report
+  ```
+
+  -- Étape 2 - Analyse des résultats
+
+  Extraire et analyser :
+  - **Couverture globale** : Pourcentage total de lignes couvertes
+  - **Couverture par module** : Pourcentage par package/dossier
+  - **Couverture par fichier** : Lister les fichiers avec < 80% de couverture
+  - **Tendances** : Comparer avec la couverture précédente si disponible
+
+  -- Étape 3 - Identification des points faibles
+
+  Identifier :
+  - **Fichiers sans tests** : Fichiers de code sans fichier test associé
+  - **Fonctions non couvertes** : Méthodes/classes sans tests
+  - **Branches non testées** : Conditions if/else, try/catch non couvertes
+  - **Lignes critiques** : Code métier important non testé
+
+  -- Livrables
+
+  Produire un rapport :
+
+  ```markdown
+  # Analyse de Couverture Existante
+
+  ## Résumé
+  - **Couverture globale** : <pourcentage>%
+  - **Seuil cible** : 80%
+  - **Fichiers analysés** : <nombre>
+  - **Fichiers sous le seuil** : <nombre>
+
+  ## Couverture par Module
+  | Module | Lignes | Branches | Coverage |
+  |--------|--------|----------|----------|
+  | <module> | <n> | <n> | <pourcentage>% |
+
+  ## Fichiers sous le seuil (< 80%)
+  | Fichier | Coverage | Lignes non couvertes |
+  |---------|----------|---------------------|
+  | <fichier> | <pourcentage>% | <nombre> |
+
+  ## Points d'attention
+  - <point 1>
+  - <point 2>
+  ```
+
+  Ce rapport sera utilisé par `test_gap_identification` pour prioriser les lacunes.

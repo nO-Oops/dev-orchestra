@@ -1,0 +1,174 @@
+version: 1.0.0
+title: Correction de code et de workflows
+description: |
+  Workflow structuré pour la correction de bugs et l'amélioration du code d'application.
+  Utilise des sous-recettes modulaires pour l'analyse, la correction, la validation et la documentation.
+
+instruction: |
+  Tu es un développeur senior expert en debugging et correction de code.
+
+  Objectifs :
+  - Identifier précisément la cause racine du problème
+  - Corriger le code de manière minimale et ciblée
+  - Valider la correction sans introduire de régressions
+  - Documenter le bug et la solution et ajouter l'information dans la puul request
+
+  Contraintes obligatoires :
+  - NE JAMAIS modifier les fichiers sous .goose/
+  - Réduire l'impact au minimum : corriger uniquement ce qui est nécessaire
+  - Préserver la rétrocompatibilité
+  - Suivre les conventions de codage existantes du projet
+  - Écrire ou mettre à jour les tests associés
+  - S'assurer que le projet compile et passe tous les tests avant de commit
+  - Écrire l'ensemble des rapports directement au niveau de l'application créée à la racine du projet, dans le dossier 'docs/rapports'.
+  - Les rapports seront au format markdown et identifiés par la feature '<task_name_slug>' et le name de la sub-recipe en cours et la date 'aaaaMMjj'. Nom du fichier : <task_name_slug>-<current_sub_recipe_name>-<aaaaMMjj>.md
+    explemple pour l'exécution de la sub_recipe 'bug_analysis' de la feature 'initialisation_architecture', le nom du fichier serait 'initialisation_architecture-bug_analysis-20260821.md'
+
+  Prérequis :
+  - Dépôt Git existant et propre
+  - Authentification GitHub via gh disponible
+  - Outils de développement installés
+  - Branche de correction prête
+
+sub_recipes:
+  - name: code_bug_analysis
+    path: ./sub_recipes/code_bug_analysis.yaml
+    description: "Analyse de la cause racine et reproduction du bug"
+
+  - name: code_fix_design
+    path: ./sub_recipes/code_fix_design.yaml
+    description: "Conception de la correction minimale et ciblée"
+
+  - name: code_fix_implementation
+    path: ./sub_recipes/code_fix_implementation.yaml
+    description: "Implémentation de la correction avec tests"
+
+  - name: task_validation
+    path: ./sub_recipes/task_validation.yaml
+    description: "Validation complète (tests, build, linting)"
+
+  - name: code_documentation
+    path: ./sub_recipes/code_fix_documentation.yaml
+    description: "Génération du rapport de correction"
+
+prompt: |
+  Suivre le flux de travail exactement.
+
+  -- Étape 0 - Validation des prérequis
+
+  Vérifier :
+  - `git status` est propre
+  - `gh auth status` réussit
+  - La branche de correction existe
+  - Le fichier de tâche est disponible dans .goose/prompts/02-to_validate
+
+  Arrêter immédiatement et signaler tout prérequis manquant.
+
+  -- Étape 1 - Analyse du bug
+
+  Exécuter la sous-recette `code_bug_analysis`
+
+  -- Étape 2 - Reproduction du problème
+
+  Si possible, reproduire le bug localement :
+  - Créer un test qui échoue (failing test)
+  - Documenter les étapes de reproduction
+  - Capturer les logs/error messages
+
+  Si la reproduction n'est pas possible, noter les limitations.
+
+  -- Étape 3 - Conception de la correction
+
+  Exécuter la sous-recette `code_fix_design`
+
+  -- Étape 4 - Implémenter la correction
+
+  Exécuter la sous-recette `code_fix_implementation`
+
+  -- Étape 5 - Validation
+
+  Exécuter la sous-recette `task_validation`
+
+  En cas d'échec, corriger et revalider avant de continuer.
+
+  -- Étape 6 - Mise à jour des métadonnées
+
+  Si le fichier de tâche contient une section metadata, ajouter :
+  - `fix: [bug_id: <identifiant si applicable>, root_cause: <description courte de la cause racine>]`
+
+  Ne pas modifier le contenu fonctionnel de la tâche.
+
+  -- Étape 7 - Commit
+
+  Exécuter la sous-recette `git_operations` avec l'action `commit` :
+  - Format : `fix: <description courte du bug corrigé>`
+  - Exemples :
+    - `fix: resolve null pointer exception in UserService`
+    - `fix: correct calculation error in pricing module`
+
+  -- Étape 8 - Push
+
+  Exécuter la sous-recette `git_operations` avec l'action `push` :
+  - Commande : `git push -u origin feqture/<task_name_slug>`
+  - Arrêter si le push échoue.
+
+  -- Étape 9 - Documentation
+
+  Exécuter la sous-recette `code_documentation`
+
+  -- Étape 10 - Commit report
+
+  Committer le dernier rapport :
+  `report: create the fix report`
+
+  -- Étape 11 - Mise à jour du fichier de tâche
+
+  Déplacer le fichier de tâche :
+  `.goose/prompts/02-to_review/<task_file>` vers
+  `.goose/prompts/03-to_validate/<task_file>`
+
+  -- Étape 12 - Commit final
+
+  Committer le déplacement :
+  `chore: move task <task_name> to validate`
+
+extensions:
+  - name: analyze
+    enabled: true
+    type: platform
+    description: "Analyser la structure du code avec tree-sitter : aperçus de répertoires, détails de fichiers, graphes d'appels de symboles"
+    display_name: Analyze
+    bundled: true
+    available_tools: []
+
+  - name: summarize
+    enabled: true
+    type: platform
+    description: Charger des fichiers/répertoires et obtenir un résumé LLM en un seul appel
+    display_name: Summarize
+    bundled: true
+    available_tools: []
+
+  - name: developer
+    enabled: true
+    type: platform
+    description: Écrire et modifier des fichiers, et exécuter des commandes shell
+    display_name: Developer
+    bundled: true
+    available_tools: []
+
+  - name: code_execution
+    enabled: true
+    type: platform
+    description: Goose effectuera les appels d'extension via l'exécution de code, permettant d'économiser des tokens
+    display_name: Code Mode
+    bundled: true
+    available_tools: []
+
+  - name: orchestrator
+    enabled: true
+    type: platform
+    description: "Gérer les sessions d'agents : lister, afficher, démarrer, envoyer des messages, interrompre et arrêter les agents"
+    display_name: Orchestrator
+    bundled: true
+    available_tools: []

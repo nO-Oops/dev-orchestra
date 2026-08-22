@@ -1,0 +1,80 @@
+version: 1.0.0
+title: Test Generation
+description: Génération automatique des tests manquants
+
+instruction: |
+  Générer les tests manquants selon le plan défini.
+
+prompt: |
+  Générer les tests manquants selon le plan défini.
+
+  -- Étape 1 - Préparation
+
+  - Vérifier que la branche de test est active
+  - Créer le fichier de test si nécessaire (ex: `test_<module>.py`)
+  - Importer les dépendances nécessaires
+
+  -- Étape 2 - Génération des tests
+
+  Pour chaque lacune prioritaire dans le plan :
+
+  Structure AAA (Arrange-Act-Assert) :
+  ```python
+  def test_<nom_descriptif>(self):
+      # Arrange - Préparation des données
+      <données d'entrée>
+
+      # Act - Exécution de l'action testée
+      <appel de la fonction/méthode>
+
+      # Assert - Vérification du résultat
+      <assertions>
+  ```
+
+  Règles de génération :
+  - **Nommage** : `test_<scénario>_<condition>` (ex: `test_login_invalid_email`)
+  - **Isolation** : Pas de dépendance entre tests
+  - **Données** : Utiliser des fixtures ou des données créées localement
+  - **Mocks** : Mockiser les dépendances externes si nécessaire
+  - **Annotations** : Ajouter `@pytest.mark.<category>` si applicable
+
+  -- Étape 3 - Vérification de la syntaxe
+
+  Pour chaque test généré :
+  - Vérifier la syntaxe (pas d'erreurs de compilation)
+  - Vérifier les imports
+  - Vérifier la structure AAA
+
+  -- Étape 4 - Documentation intrinsèque
+
+  Pour chaque test :
+  - Ajouter un docstring/commentaire décrivant le scénario
+  - Expliquer le "pourquoi" si non évident
+
+  -- Livrables
+
+  Produire un rapport de génération :
+
+  ```markdown
+  # Rapport de Génération de Tests
+
+  ## Résumé
+  - **Tests générés** : <nombre>
+  - **Fichiers créés** : <liste>
+  - **Lacunes couvertes** : <nombre>/<total>
+
+  ## Tests Générés
+  | # | Fichier | Nom du test | Couvre | Priorité |
+  |---|---------|-------------|--------|----------|
+  | 1 | <fichier> | <nom> | <scénario> | <critique/haute/moyenne/basse> |
+
+  ## Vérification de syntaxe
+  - [ ] Tous les tests sont syntaxiquement valides
+  - [ ] Tous les imports sont corrects
+  - [ ] Structure AAA respectée
+
+  ## Prêt pour validation
+  - [ ] Oui / Non
+  ```
+
+  Ce rapport sera utilisé par `test_validation` pour valider les tests.

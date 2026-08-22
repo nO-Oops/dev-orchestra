@@ -1,0 +1,27 @@
+version: 1.0.0
+title: Git Commit and Push
+description: Commit et push sécurisés avec vérification du dépôt
+
+instruction: |
+  Exécuter les opérations Git de manière sécurisée.
+
+prompt: |
+  Avant d'exécuter toute commande Git :
+
+  1. Déterminer la racine du dépôt :
+     ```bash
+     git rev-parse --show-toplevel
+     ```
+
+  2. Confirmer que le dépôt correspond à la tâche actuelle.
+
+  3. Exécuter toutes les commandes Git depuis cette racine uniquement.
+
+  4. Si le dépôt ne peut pas être identifié, arrêter et demander à l'utilisateur.
+
+  Actions disponibles :
+  - **commit** : Créer un commit avec le message `feat: <task_name>`
+  - **push** : Pousser la branche avec `git push -u origin feature/<task_name_slug>`
+  - **commit_chore** : Committer avec le message `chore: move task <task_name> to review`
+
+  Vérifier que chaque opération réussit avant de continuer.

@@ -1,0 +1,133 @@
+version: 1.0.0
+title: Fix Design
+description: |
+  Conception de la correction minimale et ciblée.
+  Évalue les approches possibles, sélectionne l'optimum et définit le plan d'exécution avec critères de validation.
+
+instruction: |
+  Concevoir la correction du bug identifié de manière minimale et ciblée.
+
+  Objectifs :
+  - Identifier toutes les approches de correction possibles
+  - Évaluer chaque approche selon des critères objectifs
+  - Sélectionner l'approche optimale
+  - Définir un plan d'implémentation clair avec critères de validation
+
+  Contraintes :
+  - Ne jamais modifier les fichiers de l'application
+  - Privilégier la minimalité : corriger uniquement ce qui est nécessaire
+  - Préserver la rétrocompatibilité et l'architecture existante
+  - S'assurer que la correction est testable et maintenable
+
+prompt: |
+  Concevoir la correction du bug en suivant le rapport d'analyse produit précédemment.
+
+  -- Étape 1 - Cadrage du périmètre
+
+  À partir du rapport `bug_analysis` :
+  - Identifier les fichiers et modules strictement concernés
+  - Délimiter le périmètre exact de la modification
+  - Lister les dépendances directes et indirectes touchées
+
+  -- Étape 2 - Identification des contraintes
+
+  Vérifier les limites à respecter :
+  - **Architecture** : Ne pas changer de pattern ou de structure existante
+  - **Performances** : Aucune régression acceptable (latence, mémoire, CPU)
+  - **Sécurité** : Aucun risque d'introduction de vulnérabilité
+  - **Tests existants** : Les tests en place doivent continuer à passer
+  - **Migration** : Pas de breaking change pour les consommateurs externes
+
+  -- Étape 3 - Génération des approches
+
+  Proposer au moins 2-3 approches de correction :
+  - **Approche A (Patch ciblé)** : Correction minimale sur la ligne/fonction défaillante
+  - **Approche B (Garde-fous)** : Ajout de validation, de try/catch ou de fallback
+  - **Approche C (Refactor léger)** : Réorganisation si la cause racine est structurelle
+  - **Approche D (Workaround)** : Contournement temporaire si la correction est trop risquée
+
+  -- Étape 4 - Évaluation des approches
+
+  Pour chaque approche, évaluer selon :
+  | Critère | Description |
+  |---------|-------------|
+  | Minimalité | Nombre de fichiers/lignes modifiés |
+  | Maintenabilité | Facilité de compréhension et de maintenance future |
+  | Performance | Impact sur les temps de réponse ou la mémoire |
+  | Sécurité | Risque d'introduction de faille |
+  | Testabilité | Facilité d'ajout de tests de validation |
+  | Risque | Potentiel de régression ou d'effet secondaire |
+
+  Noter chaque approche sur une échelle qualitative (Faible / Moyen / Élevé).
+
+  -- Étape 5 - Sélection et justification
+
+  - Sélectionner l'approche optimale
+  - Justifier le choix par rapport aux critères d'évaluation
+  - Expliquer pourquoi les autres approches ont été écartées
+  - Lister les conditions nécessaires au succès de la correction
+
+  -- Étape 6 - Plan d'implémentation et validation
+
+  Définir le plan d'exécution :
+  - **Fichiers à modifier** : Liste exacte avec nature du changement (ajout/modif/suppression)
+  - **Étapes d'implémentation** : Ordre logique des modifications
+  - **Tests à ajouter/modifier** : Cas de test nécessaires pour valider la correction
+  - **Critères de validation** :
+    * Tests unitaires à faire passer
+    * Scénarios de reproduction à vérifier
+    * Métriques de performance à surveiller
+    * Vérification manuelle si nécessaire
+
+  -- Livrables
+
+  Produire un rapport structuré :
+
+  ```markdown
+  # Conception de la Correction
+
+  ## Périmètre
+  - **Fichiers concernés** : <liste>
+  - **Modules impactés** : <liste>
+  - **Dépendances** : <liste ou "Aucune">
+
+  ## Contraintes vérifiées
+  - [ ] Architecture respectée
+  - [ ] Performances préservées
+  - [ ] Sécurité garantie
+  - [ ] Tests existants non cassés
+  - [ ] Pas de breaking change
+
+  ## Approches évaluées
+  | Approche | Minimalité | Maintenabilité | Performance | Sécurité | Testabilité | Risque |
+  |----------|------------|----------------|-------------|----------|-------------|--------|
+  | A (Patch) | ... | ... | ... | ... | ... | ... |
+  | B (Garde-fous) | ... | ... | ... | ... | ... | ... |
+  | C (Refactor) | ... | ... | ... | ... | ... | ... |
+
+  ## Approche sélectionnée : <Lettre> - <Nom>
+  - **Justification** : <explication>
+  - **Pourquoi pas les autres** : <raison>
+
+  ## Plan d'implémentation
+  1. <étape 1>
+  2. <étape 2>
+  3. <étape 3>
+
+  ## Fichiers à modifier
+  | Fichier | Type de modification | Description |
+  |---------|---------------------|-------------|
+  | <fichier> | <ajout/modif/suppr> | <détail> |
+
+  ## Tests à ajouter/modifier
+  - [ ] <test 1 : description>
+  - [ ] <test 2 : description>
+
+  ## Critères de validation
+  - [ ] Tous les tests unitaires passent
+  - [ ] Le scénario de reproduction ne génère plus d'erreur
+  - [ ] Les métriques de performance restent dans les seuils
+  - [ ] Aucun test existant n'est cassé
+
+  ## Risques résiduels
+  - <risque 1> : <mitigation>

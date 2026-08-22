@@ -1,0 +1,75 @@
+version: 1.0.0
+title: Gap Identification
+description: Identification des lacunes de couverture
+
+instruction: |
+  Identifier les lacunes de couverture à combler.
+
+prompt: |
+  Identifier les lacunes de couverture à combler.
+
+  -- Étape 1 - Analyse détaillée des lacunes
+
+  Pour chaque fichier sous le seuil de couverture :
+  - **Lignes non couvertes** : Lignes de code jamais exécutées
+  - **Branches manquantes** : Conditions if/else, switch non testées
+  - **Exceptions non couvertes** : Blocs try/catch non testés
+  - **Cas edge absents** : Valeurs limites, null, vide, erreurs
+
+  -- Étape 2 - Classification par criticité
+
+  Classifier chaque lacune :
+  - **Critique** : Code métier important, sécurité, données sensibles
+  - **Haute** : Fonctionnalités principales, chemins fréquents
+  - **Moyenne** : Utilitaires, helpers, code secondaire
+  - **Basse** : Code mort, déprécié, documentation
+
+  -- Étape 3 - Priorisation
+
+  Créer une liste priorisée des tests à générer :
+  1. **Priorité 1** : Lacunes critiques (sécurité, données)
+  2. **Priorité 2** : Lacunes hautes (fonctionnalités principales)
+  3. **Priorité 3** : Lacunes moyennes (utilitaires)
+  4. **Priorité 4** : Lacunes basses (code secondaire)
+
+  -- Étape 4 - Définition des scénarios de test
+
+  Pour chaque lacune prioritaire, définir :
+  - **Scénario de test** : Que doit tester le test ?
+  - **Données d'entrée** : Quelles valeurs utiliser ?
+  - **Comportement attendu** : Que doit se passer ?
+  - **Assertion** : Comment vérifier le résultat ?
+
+  -- Livrables
+
+  Produire un plan de tests :
+
+  ```markdown
+  # Plan de Tests à Générer
+
+  ## Résumé
+  - **Lacunes totales** : <nombre>
+  - **Tests à générer** : <nombre>
+  - **Critiques** : <nombre>
+  - **Hautes priorités** : <nombre>
+
+  ## Priorité 1 - Critiques
+  | # | Fichier | Ligne | Type de lacune | Scénario de test |
+  |---|---------|-------|----------------|------------------|
+  | 1 | <fichier> | <n> | Branche manquante | <description> |
+
+  ## Priorité 2 - Hautes
+  | # | Fichier | Ligne | Type de lacune | Scénario de test |
+  |---|---------|-------|----------------|------------------|
+  | 1 | <fichier> | <n> | Cas edge | <description> |
+
+  ## Priorité 3 - Moyennes
+  | # | Fichier | Ligne | Type de lacune | Scénario de test |
+  |---|---------|-------|----------------|------------------|
+
+  ## Priorité 4 - Basses
+  | # | Fichier | Ligne | Type de lacune | Scénario de test |
+  |---|---------|-------|----------------|------------------|
+  ```
+
+  Ce plan sera utilisé par `test_generation` pour créer les tests.

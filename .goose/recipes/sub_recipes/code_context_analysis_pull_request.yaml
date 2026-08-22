@@ -1,0 +1,95 @@
+version: 1.0.0
+title: Context Analysis for Pull Request
+description: |
+  Analyse du contexte de la pull request : historique, fichiers modifiés,
+  dépendances, et impact sur le système.
+
+instruction: |
+  Analyser le contexte de la pull request de manière approfondie.
+
+  Objectifs :
+  - Comprendre l'historique et l'évolution de la branche
+  - Identifier tous les fichiers modifiés et leur impact
+  - Analyser les dépendances entre les modifications
+  - Évaluer l'impact sur le système global
+
+  Contraintes :
+  - Ne jamais modifier les fichiers de l'application
+  - Se baser uniquement sur l'analyse des différences (diff)
+  - Produire un résumé structuré du contexte
+
+prompt: |
+  Analyser le contexte de la pull request.
+
+  -- Étape 1 - Informations de base
+
+  Récupérer et analyser :
+  - Titre de la PR
+  - Description de la PR
+  - Auteur de la PR
+  - Date de création
+  - Branche source et branche cible
+  - Nombre de commits
+  - Nombre de fichiers modifiés
+
+  -- Étape 2 - Analyse des fichiers modifiés
+
+  Pour chaque fichier modifié :
+  - Identifier le type de modification (ajout, modification, suppression)
+  - Estimer la taille du changement (lignes ajoutées/supprimées)
+  - Classifier le fichier :
+    * Code source (*.py, *.js, *.ts, *.java, etc.)
+    * Configuration (*.yaml, *.json, *.toml)
+    * Tests (*_test.*, test_*, *)
+    * Documentation (*.md, *.rst)
+    * Scripts (*.sh, *.bash)
+
+  -- Étape 3 - Analyse des différences
+
+  Pour chaque fichier de code modifié :
+  - Analyser les changements de signature de fonctions/méthodes
+  - Identifier les nouvelles dépendances ajoutées
+  - Repérer les suppressions de code
+  - Identifier les changements d'API publique
+
+  -- Étape 4 - Analyse d'impact
+
+  Évaluer l'impact des modifications :
+  - **Modules impactés** : Quels composants du projet sont affectés ?
+  - **Dépendances** : Y a-t-il de nouvelles dépendances externes ?
+  - **Rétrocompatibilité** : Les changements sont-ils rétrocompatibles ?
+  - **Performance** : Y a-t-il des changements susceptibles d'affecter les performances ?
+  - **Sécurité** : Y a-t-il des modifications de code sensible (auth, données, etc.) ?
+
+  -- Étape 5 - Historique de la branche
+
+  Analyser l'historique git de la branche :
+  - Nombre de commits et leur sémantique
+  - Y a-t-il des commits de nettoyage (squash, fixup) ?
+  - La branche est-elle à jour avec la branche cible ?
+  - Y a-t-il des conflits potentiels ?
+
+  -- Livrables
+
+  Produire un résumé structuré à intégrer dans la pull request :
+
+  ```markdown
+  # Analyse de Contexte - Pull Request
+
+  ## Informations
+  - **Titre** : <titre>
+  - **Auteur** : <auteur>
+  - **Branche** : <branche_source> → <branche_cible>
+  - **Commits** : <nombre>
+  - **Fichiers modifiés** : <nombre>
+
+  ## Impact
+  - **Modules impactés** : <liste>
+  - **Nouvelles dépendances** : <liste ou "Aucune">
+  - **Rétrocompatibilité** : <Oui/Non/Ambigu>
+  - **Risque performance** : <Faible/Moyen/Élevé>
+  - **Risque sécurité** : <Faible/Moyen/Élevé>
+
+  ## Points d'attention
+  - <point 1>
+  - <point 2>

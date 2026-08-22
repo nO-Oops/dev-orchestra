@@ -1,0 +1,134 @@
+version: 1.0.0
+title: Bug Analysis
+description: |
+  Analyse approfondie de la cause racine d'un bug.
+  Couvre la reproduction, les logs, les traces d'erreur, l'impact et les hypothèses de correction.
+
+instruction: |
+  Analyser le bug de manière systématique et approfondie.
+
+  Objectifs :
+  - Reproduire le bug de manière fiable
+  - Identifier la cause racine (root cause)
+  - Évaluer l'impact sur le système et les utilisateurs
+  - Formuler des hypothèses de correction ciblées
+  - Documenter les scénarios de reproduction
+
+  Contraintes :
+  - Ne jamais modifier les fichiers de l'application
+  - Se baser uniquement sur l'analyse des logs, traces et code
+  - Produire un rapport structuré avec des hypothèses actionnables
+
+prompt: |
+  Analyser le bug décrit dans la tâche.
+
+  -- Étape 1 - Compréhension du problème
+
+  Analyser la description de la tâche :
+  - **Comportement observé** : Que se passe-t-il concrètement ?
+  - **Comportement attendu** : Que devrait-il se passer ?
+  - **Contexte d'exécution** : Environnement, données, utilisateur
+  - **Fréquence** : Le bug est-il reproductible à 100% ? Aléatoire ?
+  - **Impact** : Critique, majeur, mineur ?
+
+  -- Étape 2 - Analyse des logs et traces
+
+  Examiner les éléments de debug disponibles :
+  - **Stack traces** : Identifier la pile d'appels défaillante
+  - **Logs d'erreur** : Messages d'erreur, niveaux (ERROR, FATAL)
+  - **Logs d'application** : Contexte avant/après l'erreur
+  - **Logs système** : Mémoire, CPU, disque, réseau
+  - **Traces de performance** : Latence, timeouts, deadlocks
+
+  -- Étape 3 - Analyse du code
+
+  Examiner le code potentiellement responsable :
+  - **Fichiers modifiés récemment** : Changements liés au bug
+  - **Conditions aux limites** : Valeurs nulles, vides, extrêmes
+  - **Gestion d'erreurs** : Blocs try/catch absents ou incorrects
+  - **Concurrence** : Race conditions, deadlocks, accès concurrents
+  - **Données** : Validation incorrecte, format invalide
+
+  -- Étape 4 - Reproduction du bug
+
+  Documenter les étapes de reproduction :
+  - **Prérequis** : Configuration, données initiales nécessaires
+  - **Étapes** : Séquence d'actions pour reproduire
+  - **Données de test** : Jeux de données spécifiques
+  - **Environnement** : OS, version, configurations particulières
+  - **Preuve** : Captures d'écran, logs, screenshots
+
+  -- Étape 5 - Identification de la cause racine
+
+  Formuler l'hypothèse de cause racine :
+  - **Cause directe** : Ligne de code ou condition qui déclenche le bug
+  - **Cause profonde** : Pourquoi cette condition existe-t-elle ?
+  - **Facteurs contributifs** : Autres éléments qui aggravent le problème
+  - **Scénarios alternatifs** : Autres causes possibles à écarter
+
+  -- Étape 6 - Évaluation de l'impact
+
+  Évaluer les conséquences du bug :
+  - **Utilisateurs impactés** : Nombre, type, criticité
+  - **Données affectées** : Perte, corruption, exposition
+  - **Système affecté** : Performance, disponibilité, sécurité
+  - **Business impact** : Revenus, réputation, conformité
+
+  -- Étape 7 - Hypothèses de correction
+
+  Proposer des pistes de correction :
+  - **Correction minimale** : Modification la plus ciblée possible
+  - **Correction robuste** : Solution qui prévient les cas similaires
+  - **Workaround** : Solution temporaire si la correction est complexe
+  - **Tests à ajouter** : Tests qui auraient détecté le bug
+
+  -- Livrables
+
+  Produire un rapport structuré :
+
+  ```markdown
+  # Rapport d'Analyse de Bug
+
+  ## Informations
+  - **Task** : <task_name>
+  - **Date d'analyse** : <date>
+  - **Analyste** : Goose AI
+
+  ## Problème
+  - **Comportement observé** : <description>
+  - **Comportement attendu** : <description>
+  - **Fréquence** : <100% / Aléatoire / Occasionnel>
+  - **Impact** : <Critique / Majeur / Mineur>
+
+  ## Logs et Traces
+  - **Stack trace** : <extrait ou référence>
+  - **Logs d'erreur** : <messages clés>
+  - **Contexte** : <environnement, données>
+
+  ## Cause Racine
+  - **Cause directe** : <description>
+  - **Cause profonde** : <explication>
+  - **Facteurs contributifs** : <liste>
+
+  ## Reproduction
+  - **Prérequis** : <liste>
+  - **Étapes** :
+    1. <étape 1>
+    2. <étape 2>
+    3. <étape 3>
+  - **Preuve** : <référence aux logs/screenshots>
+
+  ## Impact
+  - **Utilisateurs** : <nombre/type>
+  - **Données** : <type d'impact>
+  - **Système** : <performance/disponibilité/sécurité>
+  - **Business** : <impact métier>
+
+  ## Hypothèses de Correction
+  - **Correction minimale** : <description>
+  - **Correction robuste** : <description>
+  - **Tests à ajouter** : <liste>
+
+  ## Recommandations
+  1. <recommandation 1>
+  2. <recommandation 2>

@@ -1,0 +1,151 @@
+version: 1.0.0
+title: Documentation and Changelog Update
+description: |
+  Mise à jour de la documentation technique et du changelog
+  en fonction des modifications apportées au code.
+
+instruction: |
+  Tu es un rédacteur technique expert.
+
+  Objectifs :
+  - Analyser les modifications apportées au code
+  - Identifier les éléments nécessitant une mise à jour documentaire
+  - Mettre à jour la documentation technique (README, docstrings)
+  - Mettre à jour le CHANGELOG.md selon la convention Keep a Changelog
+  - Valider la cohérence et la qualité de la documentation
+
+  Contraintes obligatoires :
+  - NE JAMAIS créer de fichier ADR (déjà réalisé dans le workflow)
+  - NE JAMAIS modifier les fichiers sous .goose/ (sauf recipes)
+  - Respecter la convention Keep a Changelog pour le CHANGELOG
+  - Suivre les conventions de documentation du projet
+  - Documenter uniquement ce qui est nécessaire (pas de redondance)
+  - S'assurer que la documentation reste à jour avec le code
+  - Écrire l'ensemble des rapports directement au niveau de l'application créée, à la racine du projet dans le dossier 'docs/rapports'.
+  - Les rapports seront au format markdown et identifiés par la feature '<task_name_slug>' et le name de la sub-recipe en cours et la date 'aaaaMMjj'. Nom du fichier : <task_name_slug>-<current_sub_recipe_name>-<aaaaMMjj>.md
+    explemple pour l'exécution de la sub_recipe 'bug_analysis' de la feature 'initialisation_architecture', le nom du fichier serait 'initialisation_architecture-bug_analysis-20260821.md'
+
+  Prérequis :
+  - Dépôt Git existant et propre
+  - Fichier CHANGELOG.md existant (ou créer si absent)
+  - Documentation existante à mettre à jour
+  - Branche de documentation prête
+
+sub_recipes:
+  - name: doc_diff_analysis
+    path: ./sub_recipes/doc_diff_analysis.yaml
+    description: "Analyse des différences pour identifier les changements"
+
+  - name: doc_identification
+    path: ./sub_recipes/doc_identification.yaml
+    description: "Identification des éléments à documenter"
+
+  - name: doc_readme_update
+    path: ./sub_recipes/doc_readme_update.yaml
+    description: "Mise à jour du README"
+
+  - name: doc_inline_update
+    path: ./sub_recipes/doc_inline_update.yaml
+    description: "Mise à jour de la documentation inline"
+
+  - name: doc_changelog_update
+    path: ./sub_recipes/doc_changelog_update.yaml
+    description: "Mise à jour du CHANGELOG"
+
+  - name: doc_validation
+    path: ./sub_recipes/doc_validation.yaml
+    description: "Validation de la documentation mise à jour"
+
+  - name: git_operations
+    path: ./sub_recipes/git-operations.yaml
+    description: "Opérations Git standardisées"
+
+prompt: |
+  Suivre le flux de travail exactement.
+
+  -- Étape 0 - Validation des prérequis
+
+  Vérifier :
+  - `git status` est propre
+  - Le fichier CHANGELOG.md existe (ou sera créé)
+  - La branche de documentation existe
+  - Les fichiers de documentation existent
+
+  Arrêter immédiatement et signaler tout prérequis manquant.
+
+  -- Étape 1 - Analyse des différences
+
+  Exécuter la sous-recette `doc_diff_analysis`
+
+  -- Étape 2 - Identification des éléments à documenter
+
+  Exécuter la sous-recette `doc_identification`
+
+  -- Étape 3 - Mise à jour du README
+
+  Exécuter la sous-recette `doc_readme_update`
+
+  -- Étape 4 - Mise à jour de la documentation inline
+
+  Exécuter la sous-recette `doc_inline_update`
+
+  -- Étape 5 - Mise à jour du CHANGELOG
+
+  Exécuter la sous-recette `doc_changelog_update`
+
+  -- Étape 6 - Validation
+
+  Exécuter la sous-recette `doc_validation`
+
+  -- Étape 7 - Commit
+
+  Exécuter la sous-recette `git_commit_push` avec l'action `commit` :
+  - Format : `docs: update documentation and changelog`
+  - Vérifier que le commit réussit
+
+  -- Étape 8 - Push
+
+  Exécuter la sous-recette `git_commit_push` avec l'action `push` :
+  - Pousser la branche
+  - Arrêter si le push échoue
+
+extensions:
+  - name: analyze
+    enabled: true
+    type: platform
+    description: "Analyser la structure du code avec tree-sitter : aperçus de répertoires, détails de fichiers, graphes d'appels de symboles"
+    display_name: Analyze
+    bundled: true
+    available_tools: []
+
+  - name: summarize
+    enabled: true
+    type: platform
+    description: Charger des fichiers/répertoires et obtenir un résumé LLM en un seul appel
+    display_name: Summarize
+    bundled: true
+    available_tools: []
+
+  - name: developer
+    enabled: true
+    type: platform
+    description: Écrire et modifier des fichiers, et exécuter des commandes shell
+    display_name: Developer
+    bundled: true
+    available_tools: []
+
+  - name: code_execution
+    enabled: true
+    type: platform
+    description: Goose effectuera les appels d'extension via l'exécution de code, permettant d'économiser des tokens
+    display_name: Code Mode
+    bundled: true
+    available_tools: []
+
+  - name: orchestrator
+    enabled: true
+    type: platform
+    description: "Gérer les sessions d'agents : lister, afficher, démarrer, envoyer des messages, interrompre et arrêter les agents"
+    display_name: Orchestrator
+    bundled: true
+    available_tools: []

@@ -1,0 +1,74 @@
+version: 1.0.0
+title: Coverage Report
+description: Production du rapport de couverture final
+
+instruction: |
+  Générer le rapport de couverture final.
+
+prompt: |
+  Générer le rapport de couverture final.
+
+  -- Étape 1 - Collecte des données
+
+  Récupérer les informations des sous-recettes précédentes :
+  - `coverage_analysis` : Couverture avant
+  - `gap_identification` : Lacunes identifiées
+  - `test_generation` : Tests générés
+  - `test_validation` : Validation, couverture après
+
+  -- Étape 2 - Création du rapport
+
+  Créer le fichier `docs/rapports/<task_name_slug>-coverage-<current_sub_recipe_name>-<aaaaMMjj>.md` :
+
+  ```markdown
+  # Rapport de Couverture des Tests
+
+  ## Informations
+  - **Task** : <task_name>
+  - **Branche** : test/<task_name_slug>
+  - **Date** : <date>
+  - **Auteur** : Goose AI
+
+  ## Résumé
+  - **Couverture avant** : <pourcentage>%
+  - **Couverture après** : <pourcentage>%
+  - **Amélioration** : <+n points de pourcentage>
+  - **Tests ajoutés** : <nombre>
+  - **Lacunes comblées** : <nombre>/<total>
+
+  ## Couverture par Module
+  | Module | Avant | Après | Amélioration |
+  |--------|-------|-------|--------------|
+  | <module> | <n>% | <n>% | <+n>% |
+
+  ## Tests Ajoutés
+  | # | Fichier | Nom du test | Couvre | Statut |
+  |---|---------|-------------|--------|--------|
+  | 1 | <fichier> | <nom> | <scénario> | PASSED |
+
+  ## Lacunes Comblées
+  | # | Fichier | Type de lacune | Test ajouté |
+  |---|---------|----------------|-------------|
+  | 1 | <fichier> | Branche manquante | <nom_test> |
+
+  ## Recommandations
+  1. <recommandation 1>
+  2. <recommandation 2>
+
+  ## Points d'attention
+  - <point 1>
+  ```
+
+  -- Étape 3 - Vérification
+
+  Vérifier que :
+  - [ ] Toutes les sections sont remplies
+  - [ ] Les données sont cohérentes
+  - [ ] Le fichier est créé dans `.goose/reports/`
+
+  -- Livrables
+
+  Confirmer :
+  - **Fichier créé** : `.goose/reports/coverage-<task_name_slug>.md`
+  - **Taille** : <nombre de lignes>
+  - **Sections remplies** : <n>/<total>

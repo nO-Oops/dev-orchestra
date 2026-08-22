@@ -1,0 +1,114 @@
+version: 1.0.0
+title: Code Quality Analysis
+description: |
+  Analyse de la qualité du code dans la pull request.
+  Couvre la complexité, les conventions, les anti-patterns, la documentation et les bonnes pratiques.
+
+instruction: |
+  Analyser la qualité du code modifié dans la pull request.
+
+  Objectifs :
+  - Identifier les problèmes de qualité du code
+  - Vérifier le respect des conventions de codage
+  - Détecter les anti-patterns et code smells
+  - Évaluer la maintenabilité et la lisibilité
+  - Vérifier la documentation intrinsèque
+
+  Contraintes :
+  - Ne jamais modifier les fichiers de l'application
+  - Se concentrer uniquement sur les fichiers modifiés dans la PR
+  - Produire des findings actionnables avec des suggestions de correction
+
+prompt: |
+  Analyser la qualité du code dans la pull request.
+
+  -- Étape 1 - Analyse de complexité
+
+  Pour chaque fichier de code modifié :
+  - Calculer la complexité cyclomatique des fonctions/méthodes
+  - Identifier les fonctions trop complexes (seuil : > 10)
+  - Repérer les nested loops ou conditions trop profondes (> 3 niveaux)
+  - Signalier les fonctions trop longues (> 50 lignes)
+
+  -- Étape 2 - Respect des conventions
+
+  Vérifier le respect des conventions du projet :
+  - **Nommage** : Conventions de nommage respectées (variables, fonctions, classes)
+  - **Formatage** : Indentation, espacement, longueur de ligne
+  - **Structure** : Organisation du code (imports, classes, fonctions)
+  - **Style** : Conventions spécifiques au langage (PEP 8, Google Style, etc.)
+
+  -- Étape 3 - Détection des anti-patterns
+
+  Identifier les anti-patterns courants :
+  - **Duplication** : Code dupliqué ou quasi-identique
+  - **God Object** : Classes/fonctions qui font trop de choses
+  - **Spaghetti Code** : Flux de contrôle trop complexe
+  - **Magic Numbers** :valeurs littérales non expliquées
+  - **Hardcoded Values** : Configuration durcie dans le code
+  - **Commented Out Code** : Code commenté non supprimé
+  - **TODO/FIXME** : Notes de développement non résolues
+
+  -- Étape 4 - Bonnes pratiques
+
+  Vérifier l'application des bonnes pratiques :
+  - **DRY** (Don't Repeat Yourself) : Pas de duplication inutile
+  - **SOLID** : Principes de conception respectés
+  - **KISS** (Keep It Simple, Stupid) : Code simple et direct
+  - **YAGNI** (You Aren't Gonna Need It) : Pas de sur-engineering
+  - **Error Handling** : Gestion appropriée des erreurs
+  - **Logging** : Logs pertinents et niveaux appropriés
+
+  -- Étape 5 - Documentation intrinsèque
+
+  Évaluer la documentation du code :
+  - **Nommage significatif** : Les noms expliquent le "pourquoi"
+  - **Comments** : Comments utiles (pas de redondance)
+  - **Docstrings/JavaDoc** : Documentation des fonctions/classes publiques
+  - **README/CHANGELOG** : Mise à jour si nécessaire
+
+  -- Étape 6 - Sécurité du code
+
+  Identifier les risques de sécurité potentiels :
+  - **Injection** : Requêtes SQL, commandes shell non sanitizées
+  - **Validation** : Validation des entrées utilisateur
+  - **Authentification** : Gestion des tokens, sessions
+  - **Données sensibles** : Logs de mots de passe, clés API
+  - **Dépendances** : Versions vulnérables identifiées
+
+  -- Livrables
+
+  Produire un rapport structuré :
+
+  ```markdown
+  # Analyse de Qualité du Code
+
+  ## Résumé
+  - **Score global** : <Excellent/Bon/ Moyen/À améliorer/Critique>
+  - **Fichiers analysés** : <nombre>
+  - **Problèmes critiques** : <nombre>
+  - **Problèmes mineurs** : <nombre>
+  - **Suggestions d'amélioration** : <nombre>
+
+  ## Problèmes Critiques
+  | # | Fichier | Ligne | Type | Description | Suggestion |
+  |---|---------|-------|------|-------------|------------|
+  | 1 | <fichier> | <ligne> | <type> | <description> | <suggestion> |
+
+  ## Problèmes Mineurs
+  | # | Fichier | Ligne | Type | Description | Suggestion |
+  |---|---------|-------|------|-------------|------------|
+  | 1 | <fichier> | <ligne> | <type> | <description> | <suggestion> |
+
+  ## Points Positifs
+  - <point 1>
+  - <point 2>
+
+  ## Suggestions d'Amélioration
+  1. <suggestion 1>
+  2. <suggestion 2>
+
+  ## Impact sur la Maintenabilité
+  - **Complexité** : <Faible/Moyenne/Élevée>
+  - **Lisibilité** : <Bonne/À améliorer>Médiocre>
+  - **Testabilité** : <Facile/Moyen/Difficile>

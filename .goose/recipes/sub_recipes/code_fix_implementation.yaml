@@ -1,0 +1,106 @@
+version: 1.0.0
+title: Fix Implementation
+description: |
+  Implémentation de la correction selon la conception validée.
+  Applique les modifications minimales, écrit/mets à jour les tests,
+  et s'assure que le code est propre, testé et documenté.
+
+instruction: |
+  Implémenter la correction du bug en suivant strictement le plan défini dans `fix_design`.
+
+  Objectifs :
+  - Appliquer les modifications de code de manière minimale et ciblée
+  - Écrire ou mettre à jour les tests associés
+  - Mettre à jour la documentation technique si nécessaire
+  - S'assurer que le code est propre, lisible et maintenable
+
+  Contraintes obligatoires :
+  - Ne jamais modifier les fichiers sous .goose/ (sauf recipes)
+  - Réduire l'impact au minimum : modifier uniquement les fichiers du périmètre validé
+  - Ne pas refactorer du code non lié au bug
+  - Préserver la rétrocompatibilité et l'architecture existante
+  - Suivre les conventions de codage du projet
+  - S'assurer que le code compile et passe tous les tests avant de passer à l'étape suivante
+
+prompt: |
+  Implémenter la correction en suivant le plan défini dans le rapport `fix_design`.
+
+  -- Étape 1 - Vérification du périmètre et préparation
+  - Relire le rapport `fix_design` pour confirmer les fichiers à modifier et l'approche choisie
+  - Vérifier que la branche de correction est active et à jour avec la cible
+  - Créer un point de sauvegarde (commit temporaire ou branch) si nécessaire pour pouvoir revenir en arrière
+
+  -- Étape 2 - Implémentation du code
+  Appliquer les modifications selon le plan :
+  - Modifier uniquement les fichiers listés dans `fix_design`
+  - Appliquer la correction minimale identifiée
+  - Ajouter des commentaires explicatifs si la logique est non-triviale
+  - Ne pas toucher au code en dehors du périmètre validé
+  - Respecter les conventions de nommage, d'indentation et de structure du projet
+
+  -- Étape 3 - Écriture / Mise à jour des tests
+  Pour chaque scénario identifié dans `fix_design` :
+  - Créer un test unitaire qui échouait avant la correction (failing test → passing test)
+  - Ajouter des tests pour les cas identifiés dans `bug_analysis`
+  - Mettre à jour les tests existants si leur comportement a changé
+  - Vérifier que les tests sont :
+    * Isolés (pas de dépendance d'état global)
+    * Reproducibles (pas de données externes non mockées)
+    * Rapides (< 1s par test unitaire)
+    * Clairs (noms descriptifs, structure AAA : Arrange-Act-Assert)
+
+  -- Étape 4 - Vérification locale
+  Exécuter la chaîne de validation locale :
+  1. Formatage du code (`prettier`, `black`, `gofmt`, etc.)
+  2. Linting (`eslint`, `pylint`, `checkstyle`, etc.)
+  3. Compilation/Build
+  4. Exécution des tests (nouveaux + existants)
+  5. Vérification manuelle du scénario de reproduction (si possible)
+
+  En cas d'échec à n'importe quelle étape :
+  - Identifier la cause
+  - Corriger l'erreur
+  - Revalider avant de continuer
+  - Ne jamais passer à l'étape suivante avec des échecs
+
+  -- Étape 5 - Documentation intrinsèque
+  - Mettre à jour les docstrings/Javadoc/README internes des fonctions modifiées
+  - Ajouter des commentaires techniques si nécessaire (pourquoi, pas juste quoi)
+  - Vérifier que les CHANGELOG/RELEASE NOTES sont mis à jour si requis par le projet
+
+  -- Livrables
+  Produire un rapport d'implémentation :
+
+  ```markdown
+  # Rapport d'Implémentation de la Correction
+
+  ## Résumé
+  - **Branche** : fix/<task_name_slug>
+  - **Fichiers modifiés** : <liste>
+  - **Tests ajoutés** : <nombre>
+  - **Tests modifiés** : <nombre>
+  - **Lignes de code ajoutées/supprimées** : <+n/-m>
+
+  ## Modifications appliquées
+  | Fichier | Lignes | Description de la modification |
+  |---------|--------|-------------------------------|
+  | <fichier> | <n> | <détail> |
+
+  ## Tests ajoutés/modifiés
+  | # | Fichier | Nom du test | Couvre |
+  |---|---------|-------------|--------|
+  | 1 | <fichier> | <nom> | <scénario> |
+
+  ## Vérification locale
+  - [ ] Formatage OK
+  - [ ] Linting OK
+  - [ ] Build réussi
+  - [ ] Tous les tests passent (<n>/<total>)
+  - [ ] Scénario de reproduction corrigé
+
+  ## Points d'attention
+  - <point 1>
+  - <point 2>
+
+  ## Prêt pour validation
+  - [ ] Oui / Non

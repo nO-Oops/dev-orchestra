@@ -1,0 +1,154 @@
+version: 1.0.0
+title: Test Coverage Analysis and Enhancement
+description: |
+  Analyse de la couverture des tests, identification des lacunes, génération automatique des tests manquants et validation de chacun d'eux.
+
+instruction: |
+  Tu es un expert en testing et couverture de code.
+
+  Objectifs :
+  - Analyser la couverture des tests existants
+  - Identifier les lacunes de couverture (code non testé, cas edge manquants)
+  - Générer automatiquement les tests manquants
+  - Valider chaque test ajouté (exécution, assertions, isolation)
+  - Produire un rapport de couverture final
+
+  Contraintes obligatoires :
+  - NE JAMAIS modifier les fichiers sous .goose/ (sauf recipes)
+  - Respecter les conventions de test du projet
+  - Les tests générés doivent être : isolés, reproductibles, rapides (<1s)
+  - Chaque test doit avoir un nom descriptif et une structure AAA (Arrange-Act-Assert)
+  - S'assurer que TOUS les tests passent avant de valider
+  - Écrire l'ensemble des rapports directement au niveau de l'application créée à la racine du projet, dans le dossier 'docs/rapports'.
+  - Les rapports seront au format markdown et identifiés par la feature '<task_name_slug>' et le name de la sub-recipe en cours et la date 'aaaaMMjj'. Nom du fichier : <task_name_slug>-<current_sub_recipe_name>-<aaaaMMjj>.md
+    explemple pour l'exécution de la sub_recipe 'test_coverage_analysis' de la feature 'initialisation_architecture', le nom du fichier serait 'initialisation_architecture-test_coverage_analysis-20260821.md'
+  Prérequis :
+  - Dépôt Git existant et propre
+  - Outils de test installés en fonction du ou des langages utilisés (pytest, jest, junit, etc.)
+  - Outils de couverture installés en fonction du ou des langages utilisés (coverage, istanbul, jacoco, etc.)
+
+sub_recipes:
+  - name: test_coverage_analysis
+    path: ./sub_recipes/test_coverage_analysis.yaml
+    description: "Analyse de la couverture des tests existants"
+
+  - name: test_gap_identification
+    path: ./sub_recipes/test_gap_identification.yaml
+    description: "Identification des lacunes de couverture"
+
+  - name: test_generation
+    path: ./sub_recipes/test-generation.yaml
+    description: "Génération automatique des tests manquants"
+
+  - name: test_validation
+    path: ./sub_recipes/test-validation.yaml
+    description: "Validation de chaque test ajouté"
+
+  - name: test_coverage_report
+    path: ./sub_recipes/test_coverage_report.yaml
+    description: "Production du rapport de couverture final"
+
+prompt: |
+  Suivre le flux de travail exactement.
+
+  -- Étape 0 - Validation des prérequis
+
+  Vérifier :
+  - `git status` est propre
+  - Les outils de test et couverture sont installés
+  - La branche <task_name_slug> existe
+  - Le fichier de tâche est disponible dans le dossier .goose/03-to_validate
+
+  Arrêter immédiatement et signaler tout prérequis manquant.
+
+  -- Étape 1 - Analyse de couverture existante
+
+  Exécuter la sous-recette `coverage_analysis` :
+  - Lancer les tests existants avec couverture
+  - Analyser les rapports de couverture
+  - Identifier le pourcentage global et par module
+
+  -- Étape 2 - Identification des lacunes
+
+  Exécuter la sous-recette `test_gap_identification` :
+  - Identifier le code non couvert (lignes, branches, conditions)
+  - Lister les fonctions/classes sans tests
+  - Identifier les cas edge manquants
+  - Prioriser les lacunes par criticité
+
+  -- Étape 3 - Génération des tests manquants
+
+  Exécuter la sous-recette `test_generation` :
+  - Générer les tests pour le code non couvert
+  - Ajouter les tests pour les cas edge identifiés
+  - Respecter les conventions de test du projet
+  - Structurer chaque test avec AAA
+
+  -- Étape 4 - Validation des tests générés
+
+  Exécuter la sous-recette `test_validation` :
+  - Exécuter chaque test généré individuellement
+  - Vérifier que tous les tests passent
+  - Confirmer l'isolation et la reproductibilité
+  - Valider les assertions
+
+  -- Étape 5 - Mise à jour des métadonnées
+
+  Si le fichier de tâche contient une section metadata, ajouter :
+  - `coverage_before`: <pourcentage avant>
+  - `coverage_after`: <pourcentage après>
+
+  -- Étape 6 - Commit
+
+  Exécuter la sous-recette `git_commit_push` avec l'action `commit` :
+  - Format : `test: add missing coverage for <module>`
+  - Vérifier que le commit réussit
+
+  -- Étape 7 - Push
+
+  Exécuter la sous-recette `git_commit_push` avec l'action `push`
+
+  -- Étape 8 - Rapport de couverture
+
+  Exécuter la sous-recette `coverage_report`
+
+extensions:
+  - name: analyze
+    enabled: true
+    type: platform
+    description: "Analyser la structure du code avec tree-sitter : aperçus de répertoires, détails de fichiers, graphes d'appels de symboles"
+    display_name: Analyze
+    bundled: true
+    available_tools: []
+
+  - name: summarize
+    enabled: true
+    type: platform
+    description: Charger des fichiers/répertoires et obtenir un résumé LLM en un seul appel
+    display_name: Summarize
+    bundled: true
+    available_tools: []
+
+  - name: developer
+    enabled: true
+    type: platform
+    description: Écrire et modifier des fichiers, et exécuter des commandes shell
+    display_name: Developer
+    bundled: true
+    available_tools: []
+
+  - name: code_execution
+    enabled: true
+    type: platform
+    description: Goose effectuera les appels d'extension via l'exécution de code, permettant d'économiser des tokens
+    display_name: Code Mode
+    bundled: true
+    available_tools: []
+
+  - name: orchestrator
+    enabled: true
+    type: platform
+    description: "Gérer les sessions d'agents : lister, afficher, démarrer, envoyer des messages, interrompre et arrêter les agents"
+    display_name: Orchestrator
+    bundled: true
+    available_tools: []

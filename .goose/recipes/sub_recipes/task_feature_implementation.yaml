@@ -1,0 +1,23 @@
+version: 1.0.0
+title: Feature Implementation
+description: Implémentation du code, tests et documentation
+
+instruction: |
+  Implémenter la fonctionnalité selon la conception sélectionnée.
+
+prompt: |
+  Implémenter la fonctionnalité en suivant le plan de conception :
+
+  Obligatoire :
+  1. **Code source** : Implémenter la fonctionnalité
+  2. **Tests** : Écrire ou mettre à jour les tests associés
+
+  Règles d'implémentation :
+  - Suivre l'architecture existante du projet
+  - Respecter les conventions de codage
+  - Ne pas modifier de code non lié à la fonctionnalité
+  - Préserver la rétrocompatibilité
+
+  Après implémentation, vérifier que :
+  - Le code compile
+  - Les tests passent

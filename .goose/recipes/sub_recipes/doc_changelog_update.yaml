@@ -1,0 +1,71 @@
+version: 1.0.0
+title: Changelog Update
+description: Mise à jour du CHANGELOG selon Keep a Changelog
+
+instruction: |
+  Mettre à jour le CHANGELOG.md selon la convention Keep a Changelog.
+
+prompt: |
+  Mettre à jour le CHANGELOG.md.
+
+  -- Étape 1 - Lecture du CHANGELOG existant
+
+  Lire le contenu actuel du CHANGELOG.md pour comprendre sa structure.
+
+  -- Étape 2 - Classification des changements
+
+  Selon l'analyse des différences, classifier chaque changement :
+  - **Added** : Nouvelles fonctionnalités
+  - **Changed** : Changements dans les fonctionnalités existantes
+  - **Deprecated** : Fonctionnalités bientôt supprimées
+  - **Removed** : Fonctionnalités supprimées
+  - **Fixed** : Corrections de bugs
+  - **Security** : Corrections de sécurité
+
+  -- Étape 3 - Création de l'entrée
+
+  Créer une entrée dans la section "Unreleased" (ou créer la section si nécessaire) :
+
+  ```markdown
+  ## [Unreleased]
+
+  ### Added
+  - <description du changement> (<fichier>)
+
+  ### Changed
+  - <description du changement> (<fichier>)
+
+  ### Fixed
+  - <description du bug corrigé> (<fichier>)
+
+  ### Security
+  - <description de la vulnérabilité corrigée> (<fichier>)
+  ```
+
+  Règles :
+  - **Format** : Suivre Keep a Changelog (https://keepachangelog.com/)
+  - **Clarté** : Décrire l'impact pour l'utilisateur
+  - **Références** : Lier aux fichiers modifiés si pertinent
+  - **Tri** : Les changements par catégorie, pas par date
+
+  -- Étape 4 - Mise à jour de la date
+
+  Si une version est publiée :
+  - Ajouter la date au format `YYYY-MM-DD`
+  - Créer une nouvelle section "Unreleased" en dessous
+
+  -- Étape 5 - Validation
+
+  Vérifier :
+  - [ ] Le format suit Keep a Changelog
+  - [ ] Tous les changements majeurs sont documentés
+  - [ ] Pas de doublons
+  - [ ] La date est correcte
+  - [ ] Les liens vers les fichiers sont valides
+
+  -- Livrables
+
+  Confirmer :
+  - **Fichier modifié** : CHANGELOG.md
+  - **Entrées ajoutées** : <nombre>
+  - **Catégories utilisées** : <liste>

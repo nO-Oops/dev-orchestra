@@ -1,0 +1,22 @@
+version: 1.0.0
+title: Task Analysis
+description: Analyse approfondie -> objectifs, contraintes, dépendances, risques
+
+instruction: |
+  Analyser complètement la tâche sélectionnée.
+
+prompt: |
+  Lire et analyser complètement le fichier de tâche :
+
+  Analyser les éléments suivants :
+  - **Objectif métier** : Quel est le but de cette tâche ?
+  - **Exigences fonctionnelles** : Quelles sont les fonctionnalités à implémenter ?
+  - **Contraintes techniques** : Quelles sont les limitations techniques ?
+  - **Dépendances** : Quels modules ou services sont nécessaires ?
+  - **Modules impactés** : Quels composants du projet seront modifiés ?
+  - **Risques** : Quels sont les risques identifiés ?
+
+  Produire un plan d'implémentation structuré avec :
+  - Étapes principales
+  - Ordre d'exécution recommandé
+  - Points d'attention

@@ -1,0 +1,80 @@
+version: 1.0.0
+title: Documentation Identification
+description: Identification des éléments à documenter
+
+instruction: |
+  Identifier tous les éléments nécessitant une mise à jour documentaire.
+
+prompt: |
+  Identifier les éléments nécessitant une mise à jour documentaire.
+
+  -- Étape 1 - Analyse des nouvelles fonctionnalités
+
+  Pour chaque fonctionnalité ajoutée :
+  - Décrire la fonctionnalité
+  - Identifier les fichiers concernés
+  - Déterminer le niveau de documentation nécessaire
+
+  -- Étape 2 - Analyse des changements d'API si nécessaire
+
+  Pour chaque changement d'API :
+  - Identifier l'API affectée
+  - Décrire le changement (ajout, modification, suppression)
+  - Déterminer l'impact sur les utilisateurs
+
+  -- Étape 3 - Analyse des configurations
+
+  Pour chaque changement de configuration :
+  - Identifier la configuration modifiée
+  - Décrire le changement
+  - Déterminer si une migration est nécessaire
+
+  -- Étape 4 - Liste des fichiers à documenter
+
+  Produire une liste des fichiers de documentation à mettre à jour :
+  - README.md (si nouvelles fonctionnalités ou changements majeurs)
+  - CHANGELOG.md (obligatoire)
+  - Docstrings des fonctions modifiées/ajoutées
+  - Documentation interne (si applicable)
+
+  -- Étape 5 - Priorisation
+
+  Classifier les documents par priorité :
+  - **Critique** : API publiques, configurations sensibles
+  - **Haute** : Fonctionnalités principales, exemples d'utilisation
+  - **Moyenne** : Documentation interne, commentaires
+  - **Basse** : Documentation mineure
+
+  -- Livrables
+
+  Produire un plan de documentation :
+
+  ```markdown
+  # Plan de Documentation
+
+  ## Résumé
+  - **Éléments à documenter** : <nombre>
+  - **Fichiers à mettre à jour** : <liste>
+
+  ## Nouvelles Fonctionnalités
+  | # | Fonctionnalité | Fichiers concernés | Priorité |
+  |---|----------------|-------------------|----------|
+  | 1 | <description> | <liste> | <critique/haute/moyenne/basse> |
+
+  ## Changements d'API
+  | # | API affectée | Type de changement | Impact | Priorité |
+  |---|--------------|-------------------|--------|----------|
+  | 1 | <api> | <ajout/modif/suppr> | <description> | <priorité> |
+
+  ## Fichiers à Mettre à Jour
+  | Fichier | Type de mise à jour | Priorité |
+  |---------|---------------------|----------|
+  | README.md | <description> | <priorité> |
+  | CHANGELOG.md | Ajout d'entrée | Critique |
+  | src/<fichier>.py | Docstrings | <priorité> |
+
+  ## Prêt pour documentation
+  - [ ] Oui / Non
+  ```
+
+  Ce plan sera utilisé par les sous-recettes de mise à jour, doc_readme_update, doc_inline_update, doc_changelog_update.

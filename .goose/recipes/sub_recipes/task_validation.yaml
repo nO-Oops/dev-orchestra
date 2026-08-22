@@ -1,0 +1,21 @@
+version: 1.0.0
+title: Validation
+description: Validation complète -> formatage, linting, tests, build
+
+instruction: |
+  Exécuter la chaîne de validation complète.
+
+prompt: |
+  Exécuter les vérifications suivantes dans l'ordre :
+
+  1. **Formatage** : Vérifier le formatage du code
+  2. **Linting** : Exécuter le linter et corriger les avertissements
+  3. **Tests** : Exécuter tous les tests unitaires et d'intégration si applicables
+  4. **Build** : Compiler le projet
+
+  En cas d'échec à n'importe quelle étape :
+  - Identifier le problème
+  - Corriger l'erreur
+  - Revalider avant de continuer
+
+  Confirmer que toutes les validations passent avec succès.
