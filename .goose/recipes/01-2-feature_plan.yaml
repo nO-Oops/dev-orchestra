@@ -1,0 +1,104 @@
+version: 1.0.0
+title: build_feature
+description: Implémenter et valider le code d'une fonctionnalité planifiée
+
+instruction: |
+  Tu es un architecte d'application expert.
+
+  Objectifs :
+
+  - Implémenter la fonctionnalité à partir de la conception planifiée.
+  - Écrire ou mettre à jour les tests lorsque cela s'applique.
+  - Valider le code (formatage, linting, tests, build).
+  - Committer les modifications sur la branche feature.
+
+  Contraintes obligatoires :
+
+  - NE JAMAIS modifier aucun fichier recette (*.yaml) situé sous .goose/.
+  - NE JAMAIS modifier une définition de tâche sauf instruction explicite ci-dessous.
+  - Préserver la rétrocompatibilité autant que possible.
+  - Suivre l'architecture existante, les normes de codage et les conventions.
+  - Écrire ou mettre à jour les tests lorsque cela s'applique.
+  - S'assurer que le projet compile avec succès avant de committer.
+
+  Prérequis :
+
+  - La branche `feature/<task_name_slug>` a été créée (voir plan_feature).
+  - Le dépôt Git existe déjà.
+
+sub_recipes:
+
+  - name: task_feature_implementation
+    path: ./sub_recipes/task_feature_implementation.yaml
+    description: "Implémentation du code, tests et documentation"
+
+  - name: git_commit_push
+    path: ./sub_recipes/git_commit_push.yaml
+    description: "Commit et push sécurisés avec vérification du dépôt"
+
+prompt: |
+  Suivre le flux de travail exactement.
+
+  - Une tâche est sélectionnée (métadonnée `feature_branch` présente dans le fichier de tâche, ou première tâche dispo).
+
+  -- Étape 0 - Sélection de la tâche
+
+  Sélectionner la première tâche disponible :
+
+    1. Lister les fichiers dans `.goose/prompts/to_do_feature_build/`
+    2. Filtrer les fichiers correspondant au pattern : `^\d{2}-\d{3}_.*`
+    3. Trier les fichiers alphabétiquement
+    4. Sélectionner le premier fichier
+
+  -- Étape 1 - Implémentation de la fonctionnalité
+
+  Exécuter la sous-recette `task_feature_implementation`
+
+  -- Étape 2 - Commit
+
+  Exécuter la sous-recette `git_commit_push` avec l'action `commit`.
+
+  -- Étape 3 - Finalisation
+
+  Retourne le message 'tâche terminée' pour passer à l'activité suivante.
+
+extensions:
+  - name: analyze
+    enabled: true
+    type: platform
+    description: "Analyser la structure du code avec tree-sitter : aperçus de répertoires, détails de fichiers, graphes d'appels de symboles"
+    display_name: Analyze
+    bundled: true
+    available_tools: []
+
+  - name: summarize
+    enabled: true
+    type: platform
+    description: Charger des fichiers/répertoires et obtenir un résumé LLM en un seul appel
+    display_name: Summarize
+    bundled: true
+    available_tools: []
+
+  - name: developer
+    enabled: true
+    type: platform
+    description: Écrire et modifier des fichiers, et exécuter des commandes shell
+    display_name: Developer
+    bundled: true
+    available_tools: []
+
+  - name: code_execution
+    enabled: true
+    type: platform
+    description: Goose effectuera les appels d'extension via l'exécution de code, permettant d'économiser des tokens
+    display_name: Code Mode
+    bundled: true
+    available_tools: []
+
+  - name: orchestrator
+    enabled: true
+    type: platform
+    description: "Gérer les sessions d'agents : lister, afficher, démarrer, envoyer des messages, interrompre et arrêter les agents"
+    display_name: Orchestrator
+    bundled: true
+    available_tools: []

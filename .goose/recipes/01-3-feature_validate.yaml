@@ -1,0 +1,135 @@
+version: 1.0.0
+title: build_feature
+description: Implémenter et valider le code d'une fonctionnalité planifiée
+
+instruction: |
+  Tu es un architecte d'application expert.
+
+  Objectifs :
+
+  - Créer l'ADR (Architecture Decision Record) de la fonctionnalité.
+  - Produire le fichier de suivi des générations.
+  - Mettre à jour les métadonnées de finalisation dans le fichier de tâche.
+  - Produire / mettre à jour la documentation technique dans `<racine_du_projet_cible>/docs`.
+  - Committer les modifications et finaliser.
+
+  Contraintes obligatoires :
+
+  - NE JAMAIS modifier aucun fichier recette (*.yaml) situé sous .goose/.
+  - NE JAMAIS modifier une définition de tâche sauf instruction explicite ci-dessous.
+  - Suivre l'architecture existante et les conventions.
+  - Enregistrer tous les fichiers liés à la documentation dans le dossier `<racine_du_projet_cible>/docs`.
+
+  Prérequis :
+
+  - L'implémentation a été validée (build_feature terminé, tests/build OK).
+  - Le dépôt Git existe déjà.
+
+sub_recipes:
+
+  - name: task_validation
+    path: ./sub_recipes/task_validation.yaml
+    description: "Validation complète : formatage, linting, tests, build"
+
+  - name: git_commit_push
+    path: ./sub_recipes/git_commit_push.yaml
+    description: "Commit et push sécurisés avec vérification du dépôt"
+
+prompt: |
+  Suivre le flux de travail exactement.
+
+  - La branche `feature/<task_name_slug>` contient l'implémentation validée.
+
+  -- Étape 0 - Sélection de la tâche
+
+  Sélectionner la première tâche disponible :
+
+    1. Lister les fichiers dans `.goose/prompts/to_do_feature_validate/`
+    2. Filtrer les fichiers correspondant au pattern : `^\d{2}-\d{3}_.*`
+    3. Trier les fichiers alphabétiquement
+    4. Sélectionner le premier fichier
+
+  -- Étape 1 - Validation
+
+  Exécuter la sous-recette `task_validation`
+
+  -- Étape 2 - Création de l'ADR
+
+  - Remplir le template avec :
+    - Titre de l'ADR
+    - Date
+    - Statut : Accepted
+    - Contexte et problèmes
+    - Décision prise
+    - Conséquences positives et négatives
+  - Nommage du fichier ADR : `adr-<aaaaMMjj>-<task_name_slug>.md`
+  - Emplacement du fichier ADR : `<racine_du_projet_cible>/docs/adr`
+
+  -- Étape 3 - Commit de l'ADR
+
+  Exécuter la sous-recette `git_commit_push` avec l'action `commit`.
+
+  -- Étape 4 - Création du fichier de suivi
+
+  Créer un fichier de suivi avec l'ensemble des informations générées lors des étapes de création de la fonctionnalité.
+  Emplacement : `<racine_du_projet_cible>/docs/tracking`
+  Nommage : `tck-create-<aaaaMMjj>-<task_name_slug>.md`
+
+  -- Étape 5 - Mise à jour des métadonnées (finalisation)
+
+  - Si le fichier de tâche contient une section metadata, ajouter :
+    ```
+    metadata:
+      step:
+        feature_generate: true
+    ```
+  - Ne pas modifier le contenu fonctionnel de la tâche
+
+  -- Étape 6 - Commit des métadonnées
+
+  Exécuter la sous-recette `git_commit_push` avec l'action `commit`.
+
+  -- Étape 7 - Finalisation
+
+  Retourne le message 'tâche terminée' pour passer à l'activité suivante.
+
+extensions:
+  - name: analyze
+    enabled: true
+    type: platform
+    description: "Analyser la structure du code avec tree-sitter : aperçus de répertoires, détails de fichiers, graphes d'appels de symboles"
+    display_name: Analyze
+    bundled: true
+    available_tools: []
+
+  - name: summarize
+    enabled: true
+    type: platform
+    description: Charger des fichiers/répertoires et obtenir un résumé LLM en un seul appel
+    display_name: Summarize
+    bundled: true
+    available_tools: []
+
+  - name: developer
+    enabled: true
+    type: platform
+    description: Écrire et modifier des fichiers, et exécuter des commandes shell
+    display_name: Developer
+    bundled: true
+    available_tools: []
+
+  - name: code_execution
+    enabled: true
+    type: platform
+    description: Goose effectuera les appels d'extension via l'exécution de code, permettant d'économiser des tokens
+    display_name: Code Mode
+    bundled: true
+    available_tools: []
+
+  - name: orchestrator
+    enabled: true
+    type: platform
+    description: "Gérer les sessions d'agents : lister, afficher, démarrer, envoyer des messages, interrompre et arrêter les agents"
+    display_name: Orchestrator
+    bundled: true
+    available_tools: []

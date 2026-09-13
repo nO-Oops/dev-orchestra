@@ -1,0 +1,135 @@
+version: 1.0.0
+title: Revue de la branche courante
+description: |
+  Revue complète de la branche courante couvrant l'architecture, la qualité du code, la sécurité,
+  les tests, les performances et la compatibilité API.
+
+instruction: |
+  Tu ne dois pas modifier les fichiers de l'application.
+  Tu rédigera l'analyse à ajouter dans le dossier docs. Utilise la branche <branch name value>
+  Tu devrais formuler des suggestions concernant les options à choisir.
+  Ne pas examiner les fichiers des répertoires 00-prepare, to_do_feature_plan, 04-close
+  Privilégie la lecture des fichiers locaux plutôt que ceux du dépôt Git distant
+
+  Contraintes obligatoires :
+  Enregistrer tous les fichiers liés à la documentation dans le dossier <racine_du_projet_cible>/docs
+
+sub_recipes:
+  - name: code_context_analysis_current_branch
+    path: sub_recipes/code_context_analysis_current_branch.yaml
+
+  - name: code_quality_analysis
+    path: sub_recipes/code_quality_analysis.yaml
+
+  - name: code_test_review_analysis
+    path: sub_recipes/code_test_review_analysis.yaml
+
+  - name: code_api_compatibility
+    path: sub_recipes/code_api_compatibility.yaml
+
+prompt: |
+  Analyser l'application située dans le répertoire courant
+
+  Exécuter toutes les sous-recettes et consolider les résultats.
+  Utiliser la valeur du nom de branche définie dans le fichier .goose/prompts/02-to_review sous le nom 'feature_branch'
+
+  -- Étape 0 - Validation des prérequis
+
+  Vérification:
+
+  'git status' du projet cible est propre. il faut exclure le répertoire .goose/ lor de la vérification
+  .goose/prompts/02-to_review exists avec au moins un fichier *.yaml, *.yml ou *.md de disponible
+
+  Arrêter immédiatement et signaler tout prérequis manquant.
+
+  -- Étape 1 - Analyse de la brache courante
+
+  Exécuter la sous-recette `code_context_analysis_current_branch`
+
+  -- Étape 2 - Analyse de la qualité du code
+
+  Exécuter la sous-recette `code_quality_analysis`
+
+  -- Étape 3 - revue de code des tests
+
+  Exécuter la sous-recette `code_test_review_analysis`
+
+  -- Étape 4 - revue de code de l'API
+
+  Si l'application est une API il faut exécuter la sous-recette `code_api_compatibility`
+
+  -- Étape 5 - Produire la documentation
+
+  Produire dans le fichier '<racine_du_projet_cible>/docs/tracking/tck-review-<aaaaMMjj>-<task_name_slug>.md':
+
+    - Résumé exécutif
+    - Résultats critiques
+    - Résultats à haute priorité
+    - Améliorations suggérées
+    - Recommandation finale
+
+    La recommandation doit être l'une des suivantes :
+      - APPROVE
+      - APPROVE_WITH_COMMENTS
+      - REQUEST_CHANGES
+
+    - Enregistrer le contenu dans le fichier '<racine_du_projet_cible>/docs/tracking/tck-review_validation-<aaaaMMjj>-<task_name_slug>.md'
+
+  -- Étape 6 - Mise à jour des métadonnées
+
+  - Si le fichier de tâche contient une section metadata, ajouter :
+    ```
+    metadata:
+      step:
+        review_analysis: true
+    ```
+  - Ne pas modifier le contenu fonctionnel de la tâche
+
+  -- Étape 7 - Commit
+
+  Exécuter la sous-recette `git_commit_push` avec l'action `commit` pour l'analise de la review
+
+  -- Étape 8 - Finalisation
+
+  Retourne le message 'tâche terminée' pour pouvoir passer à l'activité suivante
+
+extensions:
+  - name: analyze
+    enabled: true
+    type: platform
+    description: "Analyser la structure du code avec tree-sitter : aperçus de répertoires, détails de fichiers, graphes d'appels de symboles"
+    display_name: Analyze
+    bundled: true
+    available_tools: []
+
+  - name: summarize
+    enabled: true
+    type: platform
+    description: Charger des fichiers/répertoires et obtenir un résumé LLM en un seul appel
+    display_name: Summarize
+    bundled: true
+    available_tools: []
+
+  - name: developer
+    enabled: true
+    type: platform
+    description: Écrire et modifier des fichiers, et exécuter des commandes shell
+    display_name: Developer
+    bundled: true
+    available_tools: []
+
+  - name: code_execution
+    enabled: true
+    type: platform
+    description: Goose effectuera les appels d'extension via l'exécution de code, permettant d'économiser des tokens
+    display_name: Code Mode
+    bundled: true
+    available_tools: []
+
+  - name: orchestrator
+    enabled: true
+    type: platform
+    description: "Gérer les sessions d'agents : lister, afficher, démarrer, envoyer des messages, interrompre et arrêter les agents"
+    display_name: Orchestrator
+    bundled: true
+    available_tools: []

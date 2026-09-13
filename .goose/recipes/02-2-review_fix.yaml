@@ -1,0 +1,153 @@
+version: 1.0.0
+title: Correction de code et de workflows
+description: |
+  Workflow structuré pour la correction de bugs et l'amélioration du code d'application.
+  Utilise des sous-recettes modulaires pour l'analyse, la correction, la validation et la documentation.
+
+instruction: |
+  Tu es un développeur senior expert en debugging et correction de code.
+
+  Objectifs :
+  - Identifier précisément la cause racine du problème
+  - Corriger le code de manière minimale et ciblée
+  - Valider la correction sans introduire de régressions
+  - Documenter le bug et la solution et ajouter l'information dans la puul request
+
+  Contraintes obligatoires :
+  - NE JAMAIS modifier les fichiers sous .goose/
+  - Réduire l'impact au minimum : corriger uniquement ce qui est nécessaire
+  - Préserver la rétrocompatibilité
+  - Suivre les conventions de codage existantes du projet
+  - Écrire ou mettre à jour les tests associés
+  - S'assurer que le projet compile et passe tous les tests avant de commit
+  - Les rapports seront enregistré dans le dossier <racine_du_projet_cible>/docs/tracking au format markdown et nommé : tck-review_xfix_<nom>-<aaaaMMjj>-<task_name_slug>.md
+
+  Prérequis :
+  - Dépôt Git existant et propre
+  - Authentification GitHub via gh disponible
+  - Outils de développement installés
+  - Branche de correction prête
+
+sub_recipes:
+  - name: code_bug_analysis
+    path: ./sub_recipes/code_bug_analysis.yaml
+    description: "Analyse de la cause racine et reproduction du bug"
+
+  - name: code_fix_design
+    path: ./sub_recipes/code_fix_design.yaml
+    description: "Conception de la correction minimale et ciblée"
+
+  - name: code_fix_implementation
+    path: ./sub_recipes/code_fix_implementation.yaml
+    description: "Implémentation de la correction avec tests"
+
+  - name: task_validation
+    path: ./sub_recipes/task_validation.yaml
+    description: "Validation complète (tests, build, linting)"
+
+  - name: code_documentation
+    path: ./sub_recipes/code_fix_documentation.yaml
+    description: "Génération du rapport de correction"
+
+prompt: |
+  Suivre le flux de travail exactement.
+
+  Exécuter toutes les sous-recettes et consolider les résultats.
+  Utiliser la valeur du nom de branche définie dans le fichier .goose/prompts/to_do_review sous le nom 'feature_branch'
+
+  -- Étape 0 - Validation des prérequis
+
+  Vérification:
+
+  .goose/prompts/to_do_review exists avec au moins un fichier *.yaml, *.yml ou *.md de disponible
+
+  -- Étape 1 - Analyse du bug
+
+  Exécuter la sous-recette `code_bug_analysis`
+
+  -- Étape 2 - Reproduction du problème
+
+  Si possible, reproduire le bug localement :
+  - Créer un test qui échoue (failing test)
+  - Documenter les étapes de reproduction
+  - Capturer les logs/error messages
+
+  Si la reproduction n'est pas possible, noter les limitations.
+
+  -- Étape 3 - Conception de la correction
+
+  Exécuter la sous-recette `code_fix_design`
+
+  -- Étape 4 - Implémenter la correction
+
+  Exécuter la sous-recette `code_fix_implementation`
+
+  -- Étape 5 - Validation
+
+  Exécuter la sous-recette `task_validation`
+
+  En cas d'échec, corriger et revalider avant de continuer.
+
+  -- Étape 6 - Mise à jour des métadonnées
+
+  - Si le fichier de tâche contient une section metadata, ajouter :
+    ```
+    metadata:
+      step:
+        review_fix: true
+    ```
+  - Ne pas modifier le contenu fonctionnel de la tâche
+
+  -- Étape 7 - Documentation
+
+  Exécuter la sous-recette `code_documentation`
+
+  -- Étape 8 - Commit
+
+  Exécuter la sous-recette `git_commit_push` avec l'action `commit` pour la correction de la review
+  il faut préfixer le commit avec 'FIX: <commentaire du commit>'
+
+  -- Étape 9 - Finalisation
+
+  Retourne le message 'tâche terminée' pour pouvoir passer à l'activité suivante
+
+extensions:
+  - name: analyze
+    enabled: true
+    type: platform
+    description: "Analyser la structure du code avec tree-sitter : aperçus de répertoires, détails de fichiers, graphes d'appels de symboles"
+    display_name: Analyze
+    bundled: true
+    available_tools: []
+
+  - name: summarize
+    enabled: true
+    type: platform
+    description: Charger des fichiers/répertoires et obtenir un résumé LLM en un seul appel
+    display_name: Summarize
+    bundled: true
+    available_tools: []
+
+  - name: developer
+    enabled: true
+    type: platform
+    description: Écrire et modifier des fichiers, et exécuter des commandes shell
+    display_name: Developer
+    bundled: true
+    available_tools: []
+
+  - name: code_execution
+    enabled: true
+    type: platform
+    description: Goose effectuera les appels d'extension via l'exécution de code, permettant d'économiser des tokens
+    display_name: Code Mode
+    bundled: true
+    available_tools: []
+
+  - name: orchestrator
+    enabled: true
+    type: platform
+    description: "Gérer les sessions d'agents : lister, afficher, démarrer, envoyer des messages, interrompre et arrêter les agents"
+    display_name: Orchestrator
+    bundled: true
+    available_tools: []
