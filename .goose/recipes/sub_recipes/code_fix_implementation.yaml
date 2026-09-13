@@ -75,7 +75,7 @@ prompt: |
   # Rapport d'Implémentation de la Correction
 
   ## Résumé
-  - **Branche** : fix/<task_name_slug>
+  - **Branche** : fix/<feature_task_name>
   - **Fichiers modifiés** : <liste>
   - **Tests ajoutés** : <nombre>
   - **Tests modifiés** : <nombre>

@@ -42,7 +42,7 @@ prompt: |
 
   -- Livrables
 
-  Produire un plan de tests :
+  Produire un plan de test structuré à enregistrer dans `<racine_du_projet_cible>/docs/tracking/tck-test_gap-<aaaaMMjj>-<feature_task_name>.md`:
 
   ```markdown
   # Plan de Tests à Générer

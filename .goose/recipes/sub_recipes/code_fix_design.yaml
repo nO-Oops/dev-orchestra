@@ -81,7 +81,7 @@ prompt: |
 
   -- Livrables
 
-  Produire un rapport structuré :
+  Produire un rapport structuré dans le fichier '<racine_du_projet_cible>/docs/tracking/tck-review_xfix_design-<aaaaMMjj>-<feature_task_name>.md':
 
   ```markdown
   # Conception de la Correction

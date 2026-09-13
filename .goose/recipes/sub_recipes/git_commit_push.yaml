@@ -20,8 +20,6 @@ prompt: |
   4. Si le dépôt ne peut pas être identifié, arrêter et demander à l'utilisateur.
 
   Actions disponibles :
-  - **commit** : Créer un commit avec le message `feat: <task_name>`
-  - **push** : Pousser la branche avec `git push -u origin feature/<task_name_slug>`
-  - **commit_chore** : Committer avec le message `chore: move task <task_name> to review`
+  - **commit** : Ajouter les fichiers modifiés et créer un commit avec le message `feat: <task_name>`
 
   Vérifier que chaque opération réussit avant de continuer.

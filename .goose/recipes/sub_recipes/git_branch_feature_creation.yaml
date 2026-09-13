@@ -12,10 +12,10 @@ prompt: |
   - Tout en minuscules
   - Remplacer les espaces par "-"
   - Remplacer les caractères spéciaux
-  - Ajouter la date au format aaaaMMjj
+  - Ajouter la date avant le nom de la feature, au format aaaaMMjj
 
-  Nom de branche : `feature/<task_name_slug>`
+  Nom de branche : `feature/<aaaaMMjj>_<feature_task_name>`
 
-  Exécuter :
+  Exemple :
   ```bash
-  git checkout -b feature/<task_name_slug>
+  git checkout -b feature/20260902_filter-de-recherche

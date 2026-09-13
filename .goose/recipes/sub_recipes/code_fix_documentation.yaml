@@ -16,7 +16,6 @@ instruction: |
 
   Contraintes :
   - Ne jamais modifier les fichiers de l'application
-  - Créer le rapport dans `docs/rapports/<task_name_slug>-<current_sub_recipe_name>-<aaaaMMjj>.md`
   - Utiliser les informations des sous-recettes précédentes (code_bug_analysis, code_fix_design, code_fix_implementation, task_validation)
   - Produire un rapport clair et actionnable
 
@@ -33,14 +32,14 @@ prompt: |
 
   -- Étape 2 - Création du rapport
 
-  Créer le fichier `.goose/reports/fix-<task_name_slug>.md` avec le template suivant :
+  Créer le fichier '<racine_du_projet_cible>/docs/tracking/tck-review_xfix_documentation-<aaaaMMjj>-<feature_task_name>.md' avec le template suivant :
 
   ```markdown
   # Rapport de Correction de Bug
 
   ## Informations
   - **Task** : <task_name>
-  - **Branche** : fix/<task_name_slug>
+  - **Branche** : fix/<feature_task_name>
   - **Date** : <date de création du rapport>
   - **Auteur** : Goose AI
 
@@ -104,5 +103,5 @@ prompt: |
 
   ## Liens
   - **Task source** : `.goose/prompts/03-to_validate/<task_file>`
-  - **Branche** : `fix/<task_name_slug>`
+  - **Branche** : `fix/<feature_task_name>`
   - **Pull Request** : <lien si disponible>

@@ -21,9 +21,7 @@ instruction: |
   - Suivre les conventions de documentation du projet
   - Documenter uniquement ce qui est nécessaire (pas de redondance)
   - S'assurer que la documentation reste à jour avec le code
-  - Écrire l'ensemble des rapports directement au niveau de l'application créée, à la racine du projet dans le dossier 'docs/rapports'.
-  - Les rapports seront au format markdown et identifiés par la feature '<task_name_slug>' et le name de la sub-recipe en cours et la date 'aaaaMMjj'. Nom du fichier : <task_name_slug>-<current_sub_recipe_name>-<aaaaMMjj>.md
-    explemple pour l'exécution de la sub_recipe 'bug_analysis' de la feature 'initialisation_architecture', le nom du fichier serait 'initialisation_architecture-bug_analysis-20260821.md'
+  - Écrire l'ensemble des rapports directement au niveau de l'application créée, à la racine du projet dans le dossier '<racine_du_projet_cible>/docs'.
 
   Prérequis :
   - Dépôt Git existant et propre
@@ -56,20 +54,21 @@ sub_recipes:
     path: ./sub_recipes/doc_validation.yaml
     description: "Validation de la documentation mise à jour"
 
-  - name: git_operations
-    path: ./sub_recipes/git-operations.yaml
+  - name: git_commit_push
+    path: ./sub_recipes/git_commit_push.yaml
     description: "Opérations Git standardisées"
 
 prompt: |
   Suivre le flux de travail exactement.
 
+  Exécuter toutes les sous-recettes et consolider les résultats.
+  Utiliser la valeur du nom de branche définie dans le fichier .goose/prompts/to_do_doc_generate sous le nom 'feature_branch'
+
   -- Étape 0 - Validation des prérequis
 
   Vérifier :
-  - `git status` est propre
-  - Le fichier CHANGELOG.md existe (ou sera créé)
-  - La branche de documentation existe
-  - Les fichiers de documentation existent
+  Les outils de test et couverture sont installés
+  .goose/prompts/to_do_doc_generate exists avec au moins un fichier *.yaml, *.yml ou *.md de disponible-
 
   Arrêter immédiatement et signaler tout prérequis manquant.
 
@@ -103,11 +102,9 @@ prompt: |
   - Format : `docs: update documentation and changelog`
   - Vérifier que le commit réussit
 
-  -- Étape 8 - Push
+  -- Étape 8 - Finalisation
 
-  Exécuter la sous-recette `git_commit_push` avec l'action `push` :
-  - Pousser la branche
-  - Arrêter si le push échoue
+  Retourne le message 'tâche terminée' pour passer à l'activité suivante.
 
 extensions:
   - name: analyze

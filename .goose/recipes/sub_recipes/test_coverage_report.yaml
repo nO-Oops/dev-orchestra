@@ -18,14 +18,14 @@ prompt: |
 
   -- Étape 2 - Création du rapport
 
-  Créer le fichier `docs/rapports/<task_name_slug>-coverage-<current_sub_recipe_name>-<aaaaMMjj>.md` :
+  Produire un rapport structuré à enregistrer dans `<racine_du_projet_cible>/docs/tracking/tck-test_coverage-<aaaaMMjj>-<feature_task_name>.md`:
 
   ```markdown
   # Rapport de Couverture des Tests
 
   ## Informations
   - **Task** : <task_name>
-  - **Branche** : test/<task_name_slug>
+  - **Branche** : test/<feature_task_name>
   - **Date** : <date>
   - **Auteur** : Goose AI
 
@@ -69,6 +69,6 @@ prompt: |
   -- Livrables
 
   Confirmer :
-  - **Fichier créé** : `.goose/reports/coverage-<task_name_slug>.md`
+  - **Fichier créé** : `.goose/reports/coverage-<feature_task_name>.md`
   - **Taille** : <nombre de lignes>
   - **Sections remplies** : <n>/<total>

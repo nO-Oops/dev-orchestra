@@ -1,11 +1,11 @@
 version: 1.0.0
 title: Code Quality Analysis
 description: |
-  Analyse de la qualité du code dans la pull request.
+  Analyse de la qualité du code dans la branche courante.
   Couvre la complexité, les conventions, les anti-patterns, la documentation et les bonnes pratiques.
 
 instruction: |
-  Analyser la qualité du code modifié dans la pull request.
+  Analyser la qualité du code modifié dans la branche courante.
 
   Objectifs :
   - Identifier les problèmes de qualité du code
@@ -16,11 +16,11 @@ instruction: |
 
   Contraintes :
   - Ne jamais modifier les fichiers de l'application
-  - Se concentrer uniquement sur les fichiers modifiés dans la PR
+  - Se concentrer uniquement sur les fichiers modifiés dans la branche courante
   - Produire des findings actionnables avec des suggestions de correction
 
 prompt: |
-  Analyser la qualité du code dans la pull request.
+  Analyser la qualité du code dans la branche courante.
 
   -- Étape 1 - Analyse de complexité
 
@@ -78,7 +78,7 @@ prompt: |
 
   -- Livrables
 
-  Produire un rapport structuré :
+  Produire un rapport structuré à enregistrer dans `<racine_du_projet_cible>/docs/tracking/tck-review_quality-<aaaaMMjj>-<feature_task_name>.md`:
 
   ```markdown
   # Analyse de Qualité du Code

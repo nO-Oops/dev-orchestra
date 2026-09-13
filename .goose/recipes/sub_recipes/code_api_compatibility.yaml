@@ -1,7 +1,7 @@
 version: 1.0.0
 title: API Compatibility Analysis
 description: |
-  Analyse de la compatibilité API dans la pull request.
+  Analyse de la compatibilité API dans la branche courante.
   Vérifie les changements cassants, la rétrocompatibilité,
   le versioning, la documentation et l'impact sur les consommateurs.
 
@@ -21,7 +21,7 @@ instruction: |
   - Produire des findings actionnables avec des suggestions de correction ou de migration
 
 prompt: |
-  Analyser la compatibilité API dans la pull request.
+  Analyser la compatibilité API dans la branche courante.
 
   -- Étape 1 - Inventaire des changements API
 
@@ -69,7 +69,7 @@ prompt: |
 
   -- Étape 6 - Livrables
 
-  Produire un rapport structuré :
+  Produire un rapport structuré '<racine_du_projet_cible>/docs/tracking/tck-review_api-<aaaaMMjj>-<feature_task_name>.md':
 
   ```markdown
   # Analyse de Compatibilité API

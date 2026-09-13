@@ -1,11 +1,11 @@
 version: 1.0.0
 title: Test Review Analysis
 description: |
-  Analyse de la qualité et de la couverture des tests dans la pull request.
+  Analyse de la qualité et de la couverture des tests dans la branche courante.
   Vérifie la pertinence, la complétude et la robustesse des tests.
 
 instruction: |
-  Analyser les tests associés aux modifications de la pull request.
+  Analyser les tests associés aux modifications de la branche courante.
 
   Objectifs :
   - Vérifier que tous les cas fonctionnels sont testés
@@ -20,7 +20,7 @@ instruction: |
   - Produire des findings actionnables avec des suggestions
 
 prompt: |
-  Analyser les tests dans la pull request.
+  Analyser les tests dans la branche courante.
 
   -- Étape 1 - Inventaire des tests
 
@@ -91,7 +91,7 @@ prompt: |
 
   -- Livrables
 
-  Produire un rapport structuré :
+  Produire un rapport structuré '<racine_du_projet_cible>/docs/tracking/tck-review_test_quality-<aaaaMMjj>-<feature_task_name>.md':
 
   ```markdown
   # Analyse des Tests
