@@ -55,7 +55,7 @@ async def run_feature_plan(
         # Exécution de Goose CLI
         logger.info("Exécution de Goose CLI...")
         result = await run_goose_command(
-            recipe="01-1-feature_build.yaml",
+            recipe="01-1-feature_plan.yaml",
             model=model,
             provider=provider,
             interactive=False,

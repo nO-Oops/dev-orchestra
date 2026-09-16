@@ -49,7 +49,7 @@ prompt: |
 
   -- Livrables
 
-  Produire un rapport structuré à enregistrer dans `<racine_du_projet_cible>/docs/tracking/tck-test_validate-<aaaaMMjj>-<feature_task_name>.md`:
+  Produire un rapport structuré à enregistrer dans `<racine_du_projet_cible>/docs/tracking/<feature_task_name>/tck-test_validate.md`:
 
   ```markdown
   # Rapport de Validation des Tests

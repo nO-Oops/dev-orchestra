@@ -94,7 +94,7 @@ async def main():
     parser.add_argument("--max-concurrency", "-c", type=int, default=DEFAULT_MAX_CONCURRENCY, help="Nombre max de workflows simultanés")
     parser.add_argument("--dry-run", action="store_true", help="Liste les prompts sans lancer les workflows")
     parser.add_argument("--recipes-dir", "-rd", default=None, help="Chemin vers le répertoire des recipes (ex: /path/to/DevOrchestra/.goose/recipes)")
-    parser.add_argument("--max-turns", "-mt", type=int, default=100, help="Nombre maximum d'actions (tournées) Goose CLI")
+    parser.add_argument("--max-turns", "-mt", type=int, default=300, help="Nombre maximum d'actions (tournées) Goose CLI")
     parser.add_argument("--session-id", "-si", default=None, help="Session ID à transmettre aux activités (généré automatiquement si absent)")
     parser.add_argument(
         "--display-goose-log",

@@ -24,7 +24,7 @@ async def move_prompt_to_directory(
 
     Args:
         base_dir: Répertoire racine du projet
-        feature_name: Nom de la fonctionnalité (utilisé pour le nom du fichier .yml)
+        feature_name: Nom de la fonctionnalité (utilisé pour le nom du fichier .yaml)
         source_folder: Dossier source (défaut: to_do_feature_plan)
         target_folder: Dossier cible (défaut: to_do_feature_build)
 
@@ -34,7 +34,7 @@ async def move_prompt_to_directory(
     import shutil
     from pathlib import Path
 
-    source = Path(f"{base_dir}/.goose/prompts/{source_folder}/{feature_name}.yml")
+    source = Path(f"{base_dir}/.goose/prompts/{source_folder}/{feature_name}.yaml")
     target = Path(f"{base_dir}/.goose/prompts/{target_folder}")
 
     if not source.exists():
@@ -77,7 +77,7 @@ async def check_prompt_state(
     Returns:
         Dict avec:
           - exists: bool (True si le prompt a été trouvé)
-          - location: "to_do_feature_plan" | "to_do_feature_build" | "to_do_feature_validate" | None
+          - location: "to_do_feature_plan" | "to_do_feature_build" | "to_do_feature_validate" ... | None
           - path: chemin absolu vers le fichier (ou None)
     """
     from pathlib import Path
@@ -91,7 +91,7 @@ async def check_prompt_state(
         "to_do_test_generate",
         "to_do_doc_generate")
     for folder in folders:
-        candidate = Path(f"{base_dir}/.goose/prompts/{folder}/{feature_name}.yml")
+        candidate = Path(f"{base_dir}/.goose/prompts/{folder}/{feature_name}.yaml")
         if candidate.exists():
             logger.info(f"Prompt '{feature_name}' trouvé dans {folder}")
             return {"exists": True, "location": folder, "path": str(candidate)}

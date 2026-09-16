@@ -11,11 +11,11 @@ prompt: |
   Règles de génération :
   - Tout en minuscules
   - Remplacer les espaces par "-"
-  - Remplacer les caractères spéciaux
-  - Ajouter la date avant le nom de la feature, au format aaaaMMjj
+  - Remplacer les caractères spéciaux par "-"
+  - Remplacer les caractères accentués par le caractère sans accent
 
-  Nom de branche : `feature/<aaaaMMjj>_<feature_task_name>`
+  Nom de branche : `feature/<feature_task_name>`
 
   Exemple :
   ```bash
-  git checkout -b feature/20260902_filter-de-recherche
+  git checkout -b feature/ajout-de-filtres-de-recherche

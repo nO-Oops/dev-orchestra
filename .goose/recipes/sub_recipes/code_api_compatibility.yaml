@@ -69,7 +69,7 @@ prompt: |
 
   -- Étape 6 - Livrables
 
-  Produire un rapport structuré '<racine_du_projet_cible>/docs/tracking/tck-review_api-<aaaaMMjj>-<feature_task_name>.md':
+  Produire un rapport structuré '<racine_du_projet_cible>/docs/tracking/<feature_task_name>/tck-review_api.md':
 
   ```markdown
   # Analyse de Compatibilité API

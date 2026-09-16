@@ -70,7 +70,7 @@ prompt: |
 
   -- Livrables
 
-  Produire un résumé structuré à intégrer dans le fichier '<racine_du_projet_cible>/docs/tracking/tck-review_analyse-<aaaaMMjj>-<feature_task_name>.md' :
+  Produire un résumé structuré à intégrer dans le fichier '<racine_du_projet_cible>/docs/tracking/<feature_task_name>/tck-review_analyse.md' :
 
   ```markdown
   # Analyse de Contexte - Branche courante

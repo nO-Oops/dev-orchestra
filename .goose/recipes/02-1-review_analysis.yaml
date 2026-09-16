@@ -31,14 +31,13 @@ prompt: |
   Analyser l'application située dans le répertoire courant
 
   Exécuter toutes les sous-recettes et consolider les résultats.
-  Utiliser la valeur du nom de branche définie dans le fichier .goose/prompts/02-to_review sous le nom 'feature_branch'
+  Utiliser la valeur du nom de branche définie dans le fichier .goose/prompts/to_do_review sous le nom 'feature_branch'
 
   -- Étape 0 - Validation des prérequis
 
   Vérification:
 
   'git status' du projet cible est propre. il faut exclure le répertoire .goose/ lor de la vérification
-  .goose/prompts/02-to_review exists avec au moins un fichier *.yaml, *.yml ou *.md de disponible
 
   Arrêter immédiatement et signaler tout prérequis manquant.
 

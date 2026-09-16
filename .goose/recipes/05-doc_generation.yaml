@@ -55,7 +55,7 @@ sub_recipes:
     description: "Validation de la documentation mise à jour"
 
   - name: git_commit_push
-    path: ./sub_recipes/git_commit_push.yaml
+    path: ./sub_recipes/git_commit.yaml
     description: "Opérations Git standardisées"
 
 prompt: |
