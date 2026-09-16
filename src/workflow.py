@@ -282,7 +282,7 @@ class develop_feature_pipeline:
             logger.info("=== Déplacement du prompt de to_do_test_generate vers to_do_doc_generate ===")
             move_result = await workflow.execute_activity(
                 move_prompt_to_directory,
-                args=[base_dir, feature_name, "to_do_test_generate", "to_do_doc_generate"],
+                args=[base_dir, feature_name, "to_do_test_generate", "to_do_merge"],
                 start_to_close_timeout=timedelta(minutes=5),
             )
 

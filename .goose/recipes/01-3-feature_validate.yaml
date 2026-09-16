@@ -61,8 +61,8 @@ prompt: |
     - Contexte et problèmes
     - Décision prise
     - Conséquences positives et négatives
-  - Nommage du fichier ADR : `adr-<aaaaMMjj>-<task_name_slug>.md`
-  - Emplacement du fichier ADR : `<racine_du_projet_cible>/docs/adr`
+  - Nommage du fichier ADR : `adr-<task_name_slug>.md`
+  - Emplacement du fichier ADR : `<racine_du_projet_cible>/docs/adr/<feature_task_name>`
 
   -- Étape 3 - Commit de l'ADR
 

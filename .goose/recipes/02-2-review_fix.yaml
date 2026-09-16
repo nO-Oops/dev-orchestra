@@ -20,7 +20,7 @@ instruction: |
   - Suivre les conventions de codage existantes du projet
   - Écrire ou mettre à jour les tests associés
   - S'assurer que le projet compile et passe tous les tests avant de commit
-  - Les rapports seront enregistré dans le dossier <racine_du_projet_cible>/docs/tracking au format markdown et nommé : tck-review_xfix_<nom>-<aaaaMMjj>-<task_name_slug>.md
+  - Les rapports seront enregistré dans le dossier <racine_du_projet_cible>/docs/tracking/<task_name_slug> au format markdown et nommé : tck-review_xfix.md
 
   Prérequis :
   - Dépôt Git existant et propre
