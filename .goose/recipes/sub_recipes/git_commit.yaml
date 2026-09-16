@@ -1,0 +1,24 @@
+version: 1.0.0
+title: Git Commit
+description: Commit sécurisé avec vérification du dépôt
+
+instruction: |
+  Exécuter les opérations Git de manière sécurisée.
+
+prompt: |
+  Avant d'exécuter toute commande Git :
+
+  1. Déterminer la racine du dépôt :
+     ```bash
+     git rev-parse --show-toplevel
+     ```
+
+  2. Confirmer que le dépôt correspond à la tâche actuelle.
+
+  - Exécuter toutes les commandes Git depuis cette racine uniquement.
+  - Si le dépôt ne peut pas être identifié, arrêter et demander à l'utilisateur.
+
+  Actions disponibles :
+  - **commit** : Ajouter les fichiers modifiés et créer un commit avec le message `feat: <task_name>`
+
+  Vérifier que chaque opération réussit avant de continuer.
