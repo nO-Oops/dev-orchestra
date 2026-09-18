@@ -7,6 +7,7 @@ from datetime import timedelta
 from typing import Any, Dict
 
 from temporalio import activity
+from src.config import GooseConfig as gc
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +61,7 @@ async def run_feature_plan(
             provider=provider,
             interactive=False,
             cwd=base_dir,
-            timeout=timedelta(hours=3),
+            timeout=timedelta(hours=gc.plan_timeout),
             recipes_dir=recipes_dir_value,
             max_turns=max_turns_int,
             log_streaming=display_goose_log,

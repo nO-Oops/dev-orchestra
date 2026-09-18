@@ -19,7 +19,7 @@ instruction: |
   - Les tests générés doivent être : isolés, reproductibles, rapides (<1s)
   - Chaque test doit avoir un nom descriptif et une structure AAA (Arrange-Act-Assert)
   - S'assurer que TOUS les tests passent avant de valider
-  - Écrire l'ensemble des rapports directement au niveau de l'application créée à la racine du projet, dans le dossier '<racine_du_projet_cible>/docs/<task_name_slug>'.
+  - Écrire l'ensemble des rapports directement au niveau de l'application créée à la racine du projet, dans le dossier '<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tests'.
 
   Prérequis :
   - Dépôt Git existant et propre

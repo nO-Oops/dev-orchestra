@@ -21,7 +21,7 @@ instruction: |
   - Suivre les conventions de documentation du projet
   - Documenter uniquement ce qui est nécessaire (pas de redondance)
   - S'assurer que la documentation reste à jour avec le code
-  - Écrire l'ensemble des rapports directement au niveau de l'application créée, à la racine du projet dans le dossier '<racine_du_projet_cible>/docs/<task_name_slug>'.
+  - Écrire l'ensemble des rapports directement au niveau de l'application créée, à la racine du projet dans le dossier '<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/'.
 
   Prérequis :
   - Dépôt Git existant et propre

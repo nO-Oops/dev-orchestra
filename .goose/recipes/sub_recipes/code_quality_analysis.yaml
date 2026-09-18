@@ -78,7 +78,7 @@ prompt: |
 
   -- Livrables
 
-  Produire un rapport structuré à enregistrer dans `<racine_du_projet_cible>/docs/tracking/<feature_task_name>/tck-review_quality.md`:
+  Produire un rapport structuré à enregistrer dans `<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tracking/tck-review-feature_quality.md`:
 
   ```markdown
   # Analyse de Qualité du Code

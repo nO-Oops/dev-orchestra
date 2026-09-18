@@ -84,7 +84,7 @@ prompt: |
 
   -- Livrables
 
-  Produire un rapport structuré dans le fichier '<racine_du_projet_cible>/docs/tracking/<feature_task_name>/tck-review_xfix_analyse.md':
+  Produire un rapport structuré dans le fichier '<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tracking/tck-review-feature_xfix_analyse.md':
 
   ```markdown
   # Rapport d'Analyse de Bug

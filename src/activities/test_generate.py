@@ -1,4 +1,6 @@
 from temporalio.activity import defn
+from src.config import GooseConfig as gc
+
 import logging
 from typing import Dict, Any
 from datetime import timedelta
@@ -36,7 +38,7 @@ async def run_test_generation(
         model=model,
         provider=provider,
         cwd=base_dir,
-        timeout=timedelta(hours=3),
+        timeout=timedelta(hours=gc.test_timeout),
         log_streaming=display_goose_log,
     )
 

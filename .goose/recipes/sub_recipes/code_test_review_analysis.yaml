@@ -91,7 +91,7 @@ prompt: |
 
   -- Livrables
 
-  Produire un rapport structuré '<racine_du_projet_cible>/docs/tracking/<feature_task_name>/tck-review_test_quality.md':
+  Produire un rapport structuré '<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tracking/tck-review-feature_test_quality.md':
 
   ```markdown
   # Analyse des Tests

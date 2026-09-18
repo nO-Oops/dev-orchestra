@@ -1,4 +1,6 @@
 from temporalio.activity import defn
+from src.config import GooseConfig as gc
+
 # src/activities/review.py
 import logging
 from typing import Dict, Any
@@ -38,7 +40,7 @@ async def run_review_analysis(
         provider=provider,
         cwd=base_dir,
         interactive=False,
-        timeout=timedelta(hours=3),
+        timeout=timedelta(hours=gc.review_timeout),
         first_run=False,
         log_streaming=display_goose_log,
     )

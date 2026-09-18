@@ -48,7 +48,7 @@ prompt: |
 
   -- Livrables
 
-  Produire un rapport structuré à enregistrer dans `<racine_du_projet_cible>/docs/tracking/<feature_task_name>/tck-test_coverage_analysis.md`:
+  Produire un rapport structuré à enregistrer dans `<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tracking/tck-test-feature_coverage_analysis.md`:
 
   ```markdown
   # Analyse de Couverture Existante

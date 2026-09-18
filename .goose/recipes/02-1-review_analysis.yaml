@@ -59,7 +59,7 @@ prompt: |
 
   -- Étape 5 - Produire la documentation
 
-  Produire dans le fichier '<racine_du_projet_cible>/docs/tracking/tck-review-<aaaaMMjj>-<task_name_slug>.md':
+  Produire dans le fichier '<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tracking/tck-review-feature.md':
 
     - Résumé exécutif
     - Résultats critiques
@@ -72,7 +72,7 @@ prompt: |
       - APPROVE_WITH_COMMENTS
       - REQUEST_CHANGES
 
-    - Enregistrer le contenu dans le fichier '<racine_du_projet_cible>/docs/tracking/tck-review_validation-<aaaaMMjj>-<task_name_slug>.md'
+    - Enregistrer le contenu dans le fichier '<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tracking/tck-review-feature_validation.md'
 
   -- Étape 6 - Mise à jour des métadonnées
 

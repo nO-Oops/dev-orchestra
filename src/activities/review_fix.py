@@ -1,4 +1,6 @@
 from temporalio.activity import defn
+from src.config import GooseConfig as gc
+
 # src/activities/fix.py
 import logging
 from typing import Dict, Any
@@ -36,7 +38,7 @@ async def run_review_fix(
         model=model,
         provider=provider,
         cwd=base_dir,
-        timeout=timedelta(hours=3),
+        timeout=timedelta(hours=gc.fix_timeout),
         log_streaming=display_goose_log,
     )
 

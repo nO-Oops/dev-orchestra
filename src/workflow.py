@@ -28,11 +28,10 @@ class develop_feature_pipeline:
     non encore réalisées.
 
     Règles d'enchaînement :
-      - ÉTAPE 1 (génération) : exécutée uniquement si le prompt est dans to_do_feature_plan.
-      - ÉTAPE 2 (analyse) : exécutée uniquement si le prompt est dans to_do_feature_build.
-      - ÉTAPE 3 (correction) : conditionnelle, si des issues sont trouvées à l'étape 2.
-      - ÉTAPE 4 (tests) : exécutée si le prompt n'est pas déjà validé (pas en 03).
-      - ÉTAPE 5 (documentation) : exécutée si le prompt est dans 03-to_validate et qu'au moins une étape précédente a été réalisée.
+      - ÉTAPE 1 (analyse et génération) : exécutée uniquement si le prompt est dans to_do_feature_plan / to_do_feature_build.
+      - ÉTAPE 2 (correction) : conditionnelle, si des issues sont trouvées à l'étape 2.
+      - ÉTAPE 3 (tests) : exécutée si le prompt n'est pas déjà validé (pas en 03).
+      - ÉTAPE 4 (documentation) : exécutée si le prompt est dans 03-to_validate et qu'au moins une étape précédente a été réalisée.
     """
 
     async def state_prompt(self, base_dir, feature_name):
@@ -84,7 +83,7 @@ class develop_feature_pipeline:
             plan_result = await workflow.execute_activity(
                 run_feature_plan,
                 args=[feature_name, base_dir, model, provider, recipes_dir, max_turns, display_goose_log],
-                start_to_close_timeout=gc.plan_timeout,
+                start_to_close_timeout=timedelta(hours=gc.plan_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
@@ -126,7 +125,7 @@ class develop_feature_pipeline:
             generate_result = await workflow.execute_activity(
                 run_feature_build,
                 args=[feature_name, base_dir, model, provider, recipes_dir, max_turns, display_goose_log],
-                start_to_close_timeout=gc.build_timeout,
+                start_to_close_timeout=timedelta(hours=gc.build_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
@@ -168,7 +167,7 @@ class develop_feature_pipeline:
             validate_result = await workflow.execute_activity(
                 run_feature_validate,
                 args=[feature_name, base_dir, model, provider, recipes_dir, max_turns, display_goose_log],
-                start_to_close_timeout=gc.validate_timeout,
+                start_to_close_timeout=timedelta(hours=gc.validate_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
@@ -210,7 +209,7 @@ class develop_feature_pipeline:
             review_result = await workflow.execute_activity(
                 run_review_analysis,
                 args=[base_dir, model, provider, display_goose_log],
-                start_to_close_timeout=gc.review_timeout,
+                start_to_close_timeout=timedelta(hours=gc.review_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
@@ -218,7 +217,6 @@ class develop_feature_pipeline:
                 ),
             )
 
-            # === ÉTAPE 2 : Correction ===
             logger.info("=== Étape 2.2: Correction de la branche courante ===")
             fix_result = await workflow.execute_activity(
                 run_review_fix,
@@ -261,14 +259,14 @@ class develop_feature_pipeline:
             logger.info("Étape 2 et 3 : Le prompt n'est pas dans le dossier to_do_review, exclusion de l'analyse -> étape 4.")
             fix_result = {"fixes_applied": 0}
 
+        # === ÉTAPE 3 : Génération des tests ===
+        # Le chemin du prompt courant sert de référence pour l'étape de test.
         if state["location"] == "to_do_test_generate":
-            # === ÉTAPE 4 : Génération des tests ===
-            # Le chemin du prompt courant sert de référence pour l'étape de test.
-            logger.info("=== Étape 4 : Génération des tests ===")
+            logger.info("=== Étape 3 : Génération des tests ===")
             test_result = await workflow.execute_activity(
                 run_test_generation,
                 args=[state["path"], base_dir, model, provider, display_goose_log],
-                start_to_close_timeout=gc.test_timeout,
+                start_to_close_timeout=timedelta(hours=gc.test_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
@@ -306,13 +304,13 @@ class develop_feature_pipeline:
             logger.info("Étape 4 : Le prompt n'est pas dans le dossier to_do_test_generate, exclusion des tests -> étape 5.")
             test_result = {"tests_applied": 0}
 
+        # === ÉTAPE 4 : Génération de la documentation ===
         if state["location"] == "to_do_doc_generate":
-            # === ÉTAPE 5 : Génération de la documentation ===
-            logger.info("=== Étape 5 : Génération de la documentation ===")
+            logger.info("=== Étape 4 : Génération de la documentation ===")
             doc_result = await workflow.execute_activity(
                 run_doc_generation,
                 args=[state["path"], base_dir, model, provider, display_goose_log],
-                start_to_close_timeout=gc.doc_timeout,
+                start_to_close_timeout=timedelta(hours=gc.doc_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),

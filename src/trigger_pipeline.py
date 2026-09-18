@@ -24,11 +24,9 @@ from temporalio.client import Client
 from temporalio.common import WorkflowIDReusePolicy
 from temporalio.exceptions import WorkflowAlreadyStartedError
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)-7s | %(message)s",
-    datefmt="%H:%M:%S",
-)
+from src.logging_setup import configure_logging
+
+configure_logging()
 logger = logging.getLogger(__name__)
 
 # Configuration par défaut

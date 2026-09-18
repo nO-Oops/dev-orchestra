@@ -62,7 +62,7 @@ prompt: |
     - Décision prise
     - Conséquences positives et négatives
   - Nommage du fichier ADR : `adr-<task_name_slug>.md`
-  - Emplacement du fichier ADR : `<racine_du_projet_cible>/docs/adr/<feature_task_name>`
+  - Emplacement du fichier ADR : `<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/adr/`
 
   -- Étape 3 - Commit de l'ADR
 
@@ -71,8 +71,8 @@ prompt: |
   -- Étape 4 - Création du fichier de suivi
 
   Créer un fichier de suivi avec l'ensemble des informations générées lors des étapes de création de la fonctionnalité.
-  Emplacement : `<racine_du_projet_cible>/docs/tracking`
-  Nommage : `tck-create-<aaaaMMjj>-<task_name_slug>.md`
+  Emplacement : `<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tracking`
+  Nommage : `tck-create-feature.md`
 
   -- Étape 5 - Mise à jour des métadonnées (finalisation)
 

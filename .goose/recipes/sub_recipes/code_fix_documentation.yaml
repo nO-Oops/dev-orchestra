@@ -32,7 +32,7 @@ prompt: |
 
   -- Étape 2 - Création du rapport
 
-  Créer le fichier '<racine_du_projet_cible>/docs/tracking/<feature_task_name>/tck-review_xfix_documentation.md' avec le template suivant :
+  Créer le fichier '<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tracking/tck-review-feature_xfix_documentation.md' avec le template suivant :
 
   ```markdown
   # Rapport de Correction de Bug
