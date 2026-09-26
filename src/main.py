@@ -14,7 +14,7 @@ from src.activities.review_analyse import run_review_analysis
 from src.activities.review_fix import run_review_fix
 from src.activities.test_generate import run_test_generation
 from src.activities.doc_generate import run_doc_generation
-from src.activities.file_operations import move_prompt_to_directory, check_prompt_state
+from src.activities.file_operations import move_prompt_to_directory, check_prompt_state, git_commit_after_move, create_feature_branch
 
 configure_logging()
 logger = logging.getLogger(__name__)
@@ -34,6 +34,8 @@ async def main():
         run_doc_generation,
         move_prompt_to_directory,
         check_prompt_state,
+        git_commit_after_move,
+        create_feature_branch,
     ]
 
     # Créer le worker

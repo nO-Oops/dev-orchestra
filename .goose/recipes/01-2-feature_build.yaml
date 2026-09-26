@@ -32,10 +32,6 @@ sub_recipes:
     path: ./sub_recipes/task_feature_implementation.yaml
     description: "Implémentation du code, tests et documentation"
 
-  - name: git_commit_push
-    path: ./sub_recipes/git_commit.yaml
-    description: "Commit et push sécurisés avec vérification du dépôt"
-
 prompt: |
   Suivre le flux de travail exactement.
   Les subrecipes sont situées au même endroit que les recipes, dans le dossier sub_recipes

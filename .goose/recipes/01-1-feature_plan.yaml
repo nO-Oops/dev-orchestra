@@ -37,10 +37,6 @@ sub_recipes:
     path: ./sub_recipes/task_feature_design.yaml
     description: "Conception de l'implémentation avec justification"
 
-  - name: git_branch_feature_creation
-    path: ./sub_recipes/git_branch_feature_creation.yaml
-    description: "Création de la branche feature avec vérification"
-
 prompt: |
   Suivre le flux de travail exactement.
   Les subrecipes sont situées au même endroit que les recipes, dans le dossier sub_recipes

@@ -31,10 +31,6 @@ sub_recipes:
     path: ./sub_recipes/task_validation.yaml
     description: "Validation complète : formatage, linting, tests, build"
 
-  - name: git_commit_push
-    path: ./sub_recipes/git_commit.yaml
-    description: "Commit et push sécurisés avec vérification du dépôt"
-
 prompt: |
   Suivre le flux de travail exactement.
   La branche indiquée dans le fichier de tâches contient l'implémentation validée.

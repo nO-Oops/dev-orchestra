@@ -24,7 +24,6 @@ instruction: |
   - Écrire l'ensemble des rapports directement au niveau de l'application créée, à la racine du projet dans le dossier '<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/'.
 
   Prérequis :
-  - Dépôt Git existant et propre
   - Fichier CHANGELOG.md existant (ou créer si absent)
   - Documentation existante à mettre à jour
   - Branche de documentation prête
@@ -53,10 +52,6 @@ sub_recipes:
   - name: doc_validation
     path: ./sub_recipes/doc_validation.yaml
     description: "Validation de la documentation mise à jour"
-
-  - name: git_commit_push
-    path: ./sub_recipes/git_commit.yaml
-    description: "Opérations Git standardisées"
 
 prompt: |
   Suivre le flux de travail exactement.

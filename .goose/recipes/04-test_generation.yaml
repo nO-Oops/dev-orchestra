@@ -22,7 +22,6 @@ instruction: |
   - Écrire l'ensemble des rapports directement au niveau de l'application créée à la racine du projet, dans le dossier '<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tests'.
 
   Prérequis :
-  - Dépôt Git existant et propre
   - Outils de test installés en fonction du ou des langages utilisés (pytest, jest, junit, etc.)
   - Outils de couverture installés en fonction du ou des langages utilisés (coverage, istanbul, jacoco, etc.)
 
