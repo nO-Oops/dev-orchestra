@@ -221,7 +221,7 @@ class develop_feature_pipeline:
             fix_result = await workflow.execute_activity(
                 run_review_fix,
                 args=[base_dir, model, provider, None, display_goose_log],
-                start_to_close_timeout=gc.fix_timeout,
+                start_to_close_timeout=timedelta(hours=gc.fix_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
