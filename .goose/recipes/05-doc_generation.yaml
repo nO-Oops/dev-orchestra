@@ -16,7 +16,7 @@ instruction: |
 
   Contraintes obligatoires :
   - NE JAMAIS créer de fichier ADR (déjà réalisé dans le workflow)
-  - NE JAMAIS modifier les fichiers sous .goose/ (sauf recipes)
+  - NE JAMAIS modifier les fichiers sous .goose/
   - Respecter la convention Keep a Changelog pour le CHANGELOG
   - Suivre les conventions de documentation du projet
   - Documenter uniquement ce qui est nécessaire (pas de redondance)
@@ -91,13 +91,7 @@ prompt: |
 
   Exécuter la sous-recette `doc_validation`
 
-  -- Étape 7 - Commit
-
-  Exécuter la sous-recette `git_commit_push` avec l'action `commit` :
-  - Format : `docs: update documentation and changelog`
-  - Vérifier que le commit réussit
-
-  -- Étape 8 - Finalisation
+  -- Étape 7 - Finalisation
 
   Retourne le message 'tâche terminée' pour passer à l'activité suivante.
 

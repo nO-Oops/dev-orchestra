@@ -107,13 +107,7 @@ prompt: |
 
   Exécuter la sous-recette `coverage_report`
 
-  -- Étape 8 - Commit
-
-  Exécuter la sous-recette `git_commit_push` avec l'action `commit` :
-  - Format : `test: report`
-  - Vérifier que le commit réussit
-
-  -- Étape 9 - Finalisation
+  -- Étape 8 - Finalisation
 
   Retourne le message 'tâche terminée' pour passer à l'activité suivante.
 

@@ -27,12 +27,13 @@ async def run_test_generation(
     Returns:
         Dict avec tests_passed, prompt_moved, etc.
     """
-    from src.utils.goose_cli import run_goose_command
+    from src.utils.goose_cli import run_goose_command, build_goose_log_path
 
     logger.info("=== Activity 4: Test Generation ===")
     logger.info(f"Output File: {output_file}")
 
     # Exécution de Goose CLI
+    log_file = build_goose_log_path(base_dir, "test_generation")
     result = await run_goose_command(
         recipe="04-test_generation.yaml",
         model=model,
@@ -40,6 +41,7 @@ async def run_test_generation(
         cwd=base_dir,
         timeout=timedelta(hours=gc.test_timeout),
         log_streaming=display_goose_log,
+        log_file=log_file,
     )
 
     # Vérification des résultats des tests

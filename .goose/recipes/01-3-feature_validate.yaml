@@ -60,17 +60,13 @@ prompt: |
   - Nommage du fichier ADR : `adr-<task_name_slug>.md`
   - Emplacement du fichier ADR : `<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/adr/`
 
-  -- Étape 3 - Commit de l'ADR
-
-  Exécuter la sous-recette `git_commit_push` avec l'action `commit`.
-
-  -- Étape 4 - Création du fichier de suivi
+  -- Étape 3 - Création du fichier de suivi
 
   Créer un fichier de suivi avec l'ensemble des informations générées lors des étapes de création de la fonctionnalité.
   Emplacement : `<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tracking`
   Nommage : `tck-create-feature.md`
 
-  -- Étape 5 - Mise à jour des métadonnées (finalisation)
+  -- Étape 4 - Mise à jour des métadonnées (finalisation)
 
   - Si le fichier de tâche contient une section metadata, ajouter :
     ```
@@ -80,11 +76,7 @@ prompt: |
     ```
   - Ne pas modifier le contenu fonctionnel de la tâche
 
-  -- Étape 6 - Commit des métadonnées
-
-  Exécuter la sous-recette `git_commit_push` avec l'action `commit`.
-
-  -- Étape 7 - Finalisation
+  -- Étape 5 - Finalisation
 
   Retourne le message 'tâche terminée' pour passer à l'activité suivante.
 

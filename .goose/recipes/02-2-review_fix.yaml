@@ -102,12 +102,7 @@ prompt: |
 
   Exécuter la sous-recette `code_documentation`
 
-  -- Étape 8 - Commit
-
-  Exécuter la sous-recette `git_commit_push` avec l'action `commit` pour la correction de la review
-  il faut préfixer le commit avec 'FIX: <commentaire du commit>'
-
-  -- Étape 9 - Finalisation
+  -- Étape 8 - Finalisation
 
   Retourne le message 'tâche terminée' pour pouvoir passer à l'activité suivante
 

@@ -34,7 +34,7 @@ async def run_feature_validate(
     Returns:
         Dict avec les résultats de la génération
     """
-    from src.utils.goose_cli import run_goose_command
+    from src.utils.goose_cli import run_goose_command, build_goose_log_path
 
     logger.info("=== Activity 1: Feature Generation ===")
     logger.info(f"Feature: {feature_name}")
@@ -55,6 +55,7 @@ async def run_feature_validate(
 
         # Exécution de Goose CLI
         logger.info("Exécution de Goose CLI...")
+        log_file = build_goose_log_path(base_dir, f"{feature_name}_validate")
         result = await run_goose_command(
             recipe="01-3-feature_validate.yaml",
             model=model,
@@ -65,6 +66,7 @@ async def run_feature_validate(
             recipes_dir=recipes_dir_value,
             max_turns=max_turns_int,
             log_streaming=display_goose_log,
+            log_file=log_file,
         )
 
         # Extraction des résultats

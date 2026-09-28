@@ -84,11 +84,7 @@ prompt: |
     ```
   - Ne pas modifier le contenu fonctionnel de la tâche
 
-  -- Étape 7 - Commit
-
-  Exécuter la sous-recette `git_commit_push` avec l'action `commit` pour l'analise de la review
-
-  -- Étape 8 - Finalisation
+  -- Étape 7 - Finalisation
 
   Retourne le message 'tâche terminée' pour pouvoir passer à l'activité suivante
 

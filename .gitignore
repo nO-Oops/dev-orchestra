@@ -1,3 +1,6 @@
 __pycache__
 
 src/goose_temporal*
+
+# Logs des exécutions Goose CLI (redirigés ici via --no-display-goose-log)
+tmp/
