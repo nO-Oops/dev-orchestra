@@ -14,7 +14,7 @@ from src.activities.review_analyse import run_review_analysis
 from src.activities.review_fix import run_review_fix
 from src.activities.test_generate import run_test_generation
 from src.activities.doc_generate import run_doc_generation
-from src.activities.file_operations import move_prompt_to_directory, check_prompt_state
+from src.activities.file_operations import move_prompt_to_directory, check_prompt_state, git_commit_after_move, create_feature_branch
 
 logger = logging.getLogger(__name__)
 
@@ -28,11 +28,10 @@ class develop_feature_pipeline:
     non encore réalisées.
 
     Règles d'enchaînement :
-      - ÉTAPE 1 (génération) : exécutée uniquement si le prompt est dans to_do_feature_plan.
-      - ÉTAPE 2 (analyse) : exécutée uniquement si le prompt est dans to_do_feature_build.
-      - ÉTAPE 3 (correction) : conditionnelle, si des issues sont trouvées à l'étape 2.
-      - ÉTAPE 4 (tests) : exécutée si le prompt n'est pas déjà validé (pas en 03).
-      - ÉTAPE 5 (documentation) : exécutée si le prompt est dans 03-to_validate et qu'au moins une étape précédente a été réalisée.
+      - ÉTAPE 1 (analyse et génération) : exécutée uniquement si le prompt est dans to_do_feature_plan / to_do_feature_build.
+      - ÉTAPE 2 (correction) : conditionnelle, si des issues sont trouvées à l'étape 2.
+      - ÉTAPE 3 (tests) : exécutée si le prompt n'est pas déjà validé (pas en 03).
+      - ÉTAPE 4 (documentation) : exécutée si le prompt est dans 03-to_validate et qu'au moins une étape précédente a été réalisée.
     """
 
     async def state_prompt(self, base_dir, feature_name):
@@ -59,16 +58,11 @@ class develop_feature_pipeline:
         # === Détermination de l'emplacement actuel du prompt ===
         # L'activity localise le fichier prompt dans 01/02/03-to_* afin de ne
         # réexécuter que les étapes non encore réalisées (pipeline résumable).
-        logger.info("Détermination de l'emplacement du fichier prompt...")
+        logger.info("Détermination de l'emplacement du fichier prompt ")
 
         state = await self.state_prompt(base_dir, feature_name)
-        location = state["location"]
-        current_prompt_path = state["path"]
-
-        logger.info(f"Etat '{location}'")
-
         if not state["exists"]:
-            logger.error(f"Aucun fichier prompt trouvé pour '{feature_name}' dans 01/02/03-to_*.")
+            logger.error(f"Aucun fichier prompt trouvé pour '{feature_name}' dans les dossiers")
             return {
                 "success": False,
                 "feature_name": feature_name,
@@ -76,21 +70,32 @@ class develop_feature_pipeline:
                 "error_message": f"Aucun fichier prompt trouvé pour '{feature_name}'",
             }
 
-        # Au moins une étape précédente réalisée si le prompt est déjà en 02 ou 03
-        previous_steps_done = location in ("to_do_feature_plan", "to_do_feature_build")
-        logger.info(
-            f"Emplacement actuel du prompt: {location} | "
-            f"Étape(s) précédente(s) réalisée(s): {previous_steps_done}"
-        )
+        logger.info(f"{state}")
+        logger.info(f"Location : {state['location']}")
+
+        # Au moins une étape précédente réalisée si le prompt est déjà dans un état plus avancé
+        logger.info(f"Emplacement actuel du prompt: {state['location']} | ")
 
         # === Étape 1.1 : Génération de la fonctionnalité
         # (uniquement si le prompt est dans to_do_feature_plan) ===
-        if location == "to_do_feature_plan":
+        if state["location"] == "to_do_feature_plan":
+            # === Création de la branche git pour la fonctionnalité ===
+            logger.info("=== Création de la branche git pour la fonctionnalité ===")
+            branch_result = await workflow.execute_activity(
+                create_feature_branch,
+                args=[base_dir, feature_name],
+                start_to_close_timeout=timedelta(minutes=5),
+            )
+            if branch_result["success"]:
+                logger.info(f"Branche git créée : {branch_result.get('branch_name', 'unknown')}")
+            else:
+                logger.warning(f"Échec de la création de la branche git : {branch_result.get('error', 'erreur inconnue')}")
+
             logger.info("=== Étape 1.1 : Génération de la fonctionnalité ===")
             plan_result = await workflow.execute_activity(
                 run_feature_plan,
                 args=[feature_name, base_dir, model, provider, recipes_dir, max_turns, display_goose_log],
-                start_to_close_timeout=gc.plan_timeout,
+                start_to_close_timeout=timedelta(hours=gc.plan_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
@@ -110,7 +115,27 @@ class develop_feature_pipeline:
             error_move = move_result.get("error", "pas de message d'erreur")
             if move_result["move_success"]:
                 logger.info(f"Prompt file '{feature_name}.yml' déplacé de to_do_feature_plan vers to_do_feature_build.")
-                location = "to_do_feature_build"
+
+                # Commit git après le déplacement réussi
+                commit_result = await workflow.execute_activity(
+                    git_commit_after_move,
+                    args=[base_dir, feature_name, "to_do_feature_plan", "to_do_feature_build"],
+                    start_to_close_timeout=timedelta(minutes=5),
+                )
+                if commit_result["commit_success"]:
+                    logger.info(f"Commit git créé : {commit_result.get('message', 'commit')}")
+                else:
+                    logger.warning(f"Échec du commit git : {commit_result.get('error', 'erreur inconnue')}")
+
+                state = await self.state_prompt(base_dir, feature_name)
+                if not state["exists"]:
+                    logger.error(f"Aucun fichier prompt trouvé pour '{feature_name}' dans les dossiers")
+                    return {
+                        "success": False,
+                        "feature_name": feature_name,
+                        "status": "failed",
+                        "error_message": f"Aucun fichier prompt trouvé pour '{feature_name}'",
+                    }
             else:
                 logger.warning(f"Echec du déplacement avec l'erreur : {error_move}")
         else:
@@ -118,12 +143,12 @@ class develop_feature_pipeline:
 
         # === ÉTAPE 1.2 : Génération de la fonctionnalité
         # (uniquement si le prompt est dans to_do_feature_build) ===
-        if location == "to_do_feature_build":
+        if state["location"] == "to_do_feature_build":
             logger.info("=== Étape 1.2 : Génération de la fonctionnalité ===")
             generate_result = await workflow.execute_activity(
                 run_feature_build,
                 args=[feature_name, base_dir, model, provider, recipes_dir, max_turns, display_goose_log],
-                start_to_close_timeout=gc.build_timeout,
+                start_to_close_timeout=timedelta(hours=gc.build_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
@@ -143,7 +168,27 @@ class develop_feature_pipeline:
             error_move = move_result.get("error", "pas de message d'erreur")
             if move_result["move_success"]:
                 logger.info(f"Prompt file '{feature_name}.yml' déplacé de to_do_feature_build vers to_do_feature_validate.")
-                location = "to_do_feature_validate"
+
+                # Commit git après le déplacement réussi
+                commit_result = await workflow.execute_activity(
+                    git_commit_after_move,
+                    args=[base_dir, feature_name, "to_do_feature_build", "to_do_feature_validate"],
+                    start_to_close_timeout=timedelta(minutes=5),
+                )
+                if commit_result["commit_success"]:
+                    logger.info(f"Commit git créé : {commit_result.get('message', 'commit')}")
+                else:
+                    logger.warning(f"Échec du commit git : {commit_result.get('error', 'erreur inconnue')}")
+
+                state = await self.state_prompt(base_dir, feature_name)
+                if not state["exists"]:
+                    logger.error(f"Aucun fichier prompt trouvé pour '{feature_name}' dans les dossiers")
+                    return {
+                        "success": False,
+                        "feature_name": feature_name,
+                        "status": "failed",
+                        "error_message": f"Aucun fichier prompt trouvé pour '{feature_name}'",
+                    }
             else:
                 logger.warning(f"Echec du déplacement avec l'erreur : {error_move}")
         else:
@@ -151,12 +196,12 @@ class develop_feature_pipeline:
 
         # === ÉTAPE 1.3 : Génération de la fonctionnalité
         # (uniquement si le prompt est dans to_do_feature_validate) ===
-        if location == "to_do_feature_validate":
+        if state["location"] == "to_do_feature_validate":
             logger.info("=== Étape 1.3 : Génération de la fonctionnalité ===")
             validate_result = await workflow.execute_activity(
                 run_feature_validate,
                 args=[feature_name, base_dir, model, provider, recipes_dir, max_turns, display_goose_log],
-                start_to_close_timeout=gc.validate_timeout,
+                start_to_close_timeout=timedelta(hours=gc.validate_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
@@ -176,7 +221,27 @@ class develop_feature_pipeline:
             error_move = move_result.get("error", "pas de message d'erreur")
             if move_result["move_success"]:
                 logger.info(f"Prompt file '{feature_name}.yml' déplacé de to_do_feature_validate vers to_do_review.")
-                location = "to_do_review"
+
+                # Commit git après le déplacement réussi
+                commit_result = await workflow.execute_activity(
+                    git_commit_after_move,
+                    args=[base_dir, feature_name, "to_do_feature_validate", "to_do_review"],
+                    start_to_close_timeout=timedelta(minutes=5),
+                )
+                if commit_result["commit_success"]:
+                    logger.info(f"Commit git créé : {commit_result.get('message', 'commit')}")
+                else:
+                    logger.warning(f"Échec du commit git : {commit_result.get('error', 'erreur inconnue')}")
+
+                state = await self.state_prompt(base_dir, feature_name)
+                if not state["exists"]:
+                    logger.error(f"Aucun fichier prompt trouvé pour '{feature_name}' dans les dossiers")
+                    return {
+                        "success": False,
+                        "feature_name": feature_name,
+                        "status": "failed",
+                        "error_message": f"Aucun fichier prompt trouvé pour '{feature_name}'",
+                    }
             else:
                 logger.warning(f"Echec du déplacement avec l'erreur : {error_move}")
         else:
@@ -184,31 +249,24 @@ class develop_feature_pipeline:
 
         # === ÉTAPE 2 : Analyse et correction de la branche courante
         # (uniquement si le prompt est dans to_do_review) ===
-        review_result: Dict[str, Any]
-        issues_found = 0
-        review_report = None
-        if location == "to_do_review":
+        if state["location"] == "to_do_review":
             logger.info("=== Étape 2.1 : Analyse de la branche courante ===")
             review_result = await workflow.execute_activity(
                 run_review_analysis,
                 args=[base_dir, model, provider, display_goose_log],
-                start_to_close_timeout=gc.review_timeout,
+                start_to_close_timeout=timedelta(hours=gc.review_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
                     backoff_coefficient=2.0,
                 ),
             )
-            issues_found = review_result["issues_found"]
-            # review_report = review_result["review_report"]
-            logger.info(f"Issues Found: {issues_found}")
 
-            # === ÉTAPE 2 : Correction ===
-            logger.info(f"=== Étape 2.2: Correction de la branche {issues_found} ===")
+            logger.info("=== Étape 2.2: Correction de la branche courante ===")
             fix_result = await workflow.execute_activity(
                 run_review_fix,
-                args=[base_dir, model, provider, review_report, display_goose_log],
-                start_to_close_timeout=gc.fix_timeout,
+                args=[base_dir, model, provider, None, display_goose_log],
+                start_to_close_timeout=timedelta(hours=gc.fix_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
@@ -228,7 +286,27 @@ class develop_feature_pipeline:
             error_move = move_result.get("error", "pas de message d'erreur")
             if move_result["move_success"]:
                 logger.info(f"Prompt file '{feature_name}.yml' déplacé de to_do_review vers to_do_test_generate.")
-                location = "to_do_test_generate"
+
+                # Commit git après le déplacement réussi
+                commit_result = await workflow.execute_activity(
+                    git_commit_after_move,
+                    args=[base_dir, feature_name, "to_do_review", "to_do_test_generate"],
+                    start_to_close_timeout=timedelta(minutes=5),
+                )
+                if commit_result["commit_success"]:
+                    logger.info(f"Commit git créé : {commit_result.get('message', 'commit')}")
+                else:
+                    logger.warning(f"Échec du commit git : {commit_result.get('error', 'erreur inconnue')}")
+
+                state = await self.state_prompt(base_dir, feature_name)
+                if not state["exists"]:
+                    logger.error(f"Aucun fichier prompt trouvé pour '{feature_name}' dans les dossiers")
+                    return {
+                        "success": False,
+                        "feature_name": feature_name,
+                        "status": "failed",
+                        "error_message": f"Aucun fichier prompt trouvé pour '{feature_name}'",
+                    }
             else:
                 logger.warning(f"Echec du déplacement avec l'erreur : {error_move}")
         else:
@@ -237,14 +315,14 @@ class develop_feature_pipeline:
             logger.info("Étape 2 et 3 : Le prompt n'est pas dans le dossier to_do_review, exclusion de l'analyse -> étape 4.")
             fix_result = {"fixes_applied": 0}
 
-        if location == "to_do_test_generate":
-            # === ÉTAPE 4 : Génération des tests ===
-            # Le chemin du prompt courant sert de référence pour l'étape de test.
-            logger.info("=== Étape 4 : Génération des tests ===")
+        # === ÉTAPE 3 : Génération des tests ===
+        # Le chemin du prompt courant sert de référence pour l'étape de test.
+        if state["location"] == "to_do_test_generate":
+            logger.info("=== Étape 3 : Génération des tests ===")
             test_result = await workflow.execute_activity(
                 run_test_generation,
-                args=[current_prompt_path, base_dir, model, provider, display_goose_log],
-                start_to_close_timeout=gc.test_timeout,
+                args=[state["path"], base_dir, model, provider, display_goose_log],
+                start_to_close_timeout=timedelta(hours=gc.test_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
@@ -252,25 +330,40 @@ class develop_feature_pipeline:
                 ),
             )
 
-            # L'activité de génération de tests ne renvoie pas de clé 'issues_found'
-            # (elle retourne 'tests_passed'). On conserve donc la valeur calculée à
-            # l'étape d'analyse (review) afin de ne pas perdre l'information et de
-            # ne pas planter si la clé est absente.
-            issues_found = test_result.get("issues_found", issues_found)
-            logger.info(f"Issues Found: {issues_found}")
+            # On conserve donc la valeur calculée à l'étape d'analyse (review) afin de ne pas perdre l'information
 
             # === Déplacement du prompt de to_do_review vers to_do_doc_generate ===
             logger.info("=== Déplacement du prompt de to_do_test_generate vers to_do_doc_generate ===")
             move_result = await workflow.execute_activity(
                 move_prompt_to_directory,
-                args=[base_dir, feature_name, "to_do_test_generate", "to_do_doc_generate"],
+                args=[base_dir, feature_name, "to_do_test_generate", "to_do_merge"],
                 start_to_close_timeout=timedelta(minutes=5),
             )
 
             error_move = move_result.get("error", "pas de message d'erreur")
             if move_result["move_success"]:
-                logger.info(f"Prompt file '{feature_name}.yml' déplacé de to_do_test_generate vers to_do_doc_generate.")
-                location = "to_do_doc_generate"
+                logger.info(f"Prompt file '{feature_name}.yml' déplacé de to_do_test_generate vers to_do_merge.")
+
+                # Commit git après le déplacement réussi
+                commit_result = await workflow.execute_activity(
+                    git_commit_after_move,
+                    args=[base_dir, feature_name, "to_do_test_generate", "to_do_merge"],
+                    start_to_close_timeout=timedelta(minutes=5),
+                )
+                if commit_result["commit_success"]:
+                    logger.info(f"Commit git créé : {commit_result.get('message', 'commit')}")
+                else:
+                    logger.warning(f"Échec du commit git : {commit_result.get('error', 'erreur inconnue')}")
+
+                state = await self.state_prompt(base_dir, feature_name)
+                if not state["exists"]:
+                    logger.error(f"Aucun fichier prompt trouvé pour '{feature_name}' dans les dossiers")
+                    return {
+                        "success": False,
+                        "feature_name": feature_name,
+                        "status": "failed",
+                        "error_message": f"Aucun fichier prompt trouvé pour '{feature_name}'",
+                    }
             else:
                 logger.warning(f"Echec du déplacement avec l'erreur : {error_move}")
         else:
@@ -278,13 +371,13 @@ class develop_feature_pipeline:
             logger.info("Étape 4 : Le prompt n'est pas dans le dossier to_do_test_generate, exclusion des tests -> étape 5.")
             test_result = {"tests_applied": 0}
 
-        if location == "to_do_doc_generate":
-            # === ÉTAPE 5 : Génération de la documentation ===
-            logger.info("=== Étape 5 : Génération de la documentation ===")
+        # === ÉTAPE 4 : Génération de la documentation ===
+        if state["location"] == "to_do_doc_generate":
+            logger.info("=== Étape 4 : Génération de la documentation ===")
             doc_result = await workflow.execute_activity(
                 run_doc_generation,
-                args=[current_prompt_path, base_dir, model, provider, display_goose_log],
-                start_to_close_timeout=gc.doc_timeout,
+                args=[state["path"], base_dir, model, provider, display_goose_log],
+                start_to_close_timeout=timedelta(hours=gc.doc_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
                     initial_interval=timedelta(seconds=10),
@@ -303,7 +396,17 @@ class develop_feature_pipeline:
             error_move = move_result.get("error", "pas de message d'erreur")
             if move_result["move_success"]:
                 logger.info(f"Prompt file '{feature_name}.yml' déplacé de to_do_doc_generate vers to_merge.")
-                location = "to_do_test_generate"
+
+                # Commit git après le déplacement réussi
+                commit_result = await workflow.execute_activity(
+                    git_commit_after_move,
+                    args=[base_dir, feature_name, "to_do_doc_generate", "to_merge"],
+                    start_to_close_timeout=timedelta(minutes=5),
+                )
+                if commit_result["commit_success"]:
+                    logger.info(f"Commit git créé : {commit_result.get('message', 'commit')}")
+                else:
+                    logger.warning(f"Échec du commit git : {commit_result.get('error', 'erreur inconnue')}")
             else:
                 logger.warning(f"Echec du déplacement avec l'erreur : {error_move}")
 

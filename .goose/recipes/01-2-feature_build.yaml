@@ -32,16 +32,12 @@ sub_recipes:
     path: ./sub_recipes/task_feature_implementation.yaml
     description: "Implémentation du code, tests et documentation"
 
-  - name: git_commit_push
-    path: ./sub_recipes/git_commit_push.yaml
-    description: "Commit et push sécurisés avec vérification du dépôt"
-
 prompt: |
   Suivre le flux de travail exactement.
+  Les subrecipes sont situées au même endroit que les recipes, dans le dossier sub_recipes
+  Une tâche est sélectionnée (métadonnée `feature_branch` présente dans le fichier de tâche, ou première tâche dispo).
 
-  - Une tâche est sélectionnée (métadonnée `feature_branch` présente dans le fichier de tâche, ou première tâche dispo).
-
-  -- Étape 0 - Sélection de la tâche
+  -- Étape 1 - Sélection de la tâche
 
   Sélectionner la première tâche disponible :
 
@@ -50,13 +46,9 @@ prompt: |
     3. Trier les fichiers alphabétiquement
     4. Sélectionner le premier fichier
 
-  -- Étape 1 - Implémentation de la fonctionnalité
+  -- Étape 2 - Implémentation de la fonctionnalité
 
   Exécuter la sous-recette `task_feature_implementation`
-
-  -- Étape 2 - Commit
-
-  Exécuter la sous-recette `git_commit_push` avec l'action `commit`.
 
   -- Étape 3 - Finalisation
 

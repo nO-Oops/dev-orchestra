@@ -1,6 +1,6 @@
 version: 1.0.0
 title: plan_feature
-description: Planifier une fonctionnalité à partir d'une tâche projet (analyse, conception, création de branche)
+description: Planifier une fonctionnalité à partir d'une tâche projet (analyse, conception)
 
 instruction: |
   Tu es un architecte d'application expert.
@@ -10,7 +10,6 @@ instruction: |
   - Sélectionner la prochaine tâche à implémenter.
   - Analyser la base de code et l'architecture existantes.
   - Concevoir l'implémentation de la fonctionnalité avec justification.
-  - Créer une branche git dédiée.
   - Enregistrer les métadonnées de planification et committer.
 
   Contraintes obligatoires :
@@ -37,12 +36,9 @@ sub_recipes:
     path: ./sub_recipes/task_feature_design.yaml
     description: "Conception de l'implémentation avec justification"
 
-  - name: git_branch_feature_creation
-    path: ./sub_recipes/git_branch_feature_creation.yaml
-    description: "Création de la branche feature avec vérification"
-
 prompt: |
   Suivre le flux de travail exactement.
+  Les subrecipes sont situées au même endroit que les recipes, dans le dossier sub_recipes
 
   -- Étape 0 - Validation des prérequis
 
@@ -70,24 +66,16 @@ prompt: |
 
   Exécuter la sous-recette `task_feature_design`
 
-  -- Étape 4 - Création de la branche feature
+  -- Étape 4 - Mise à jour des métadonnées (planification)
 
-  Exécuter la sous-recette `git_branch_feature_creation`
-
-  -- Étape 5 - Mise à jour des métadonnées (planification)
-
-  - Si le fichier de tâche contient une section metadata, ajouter :
+  - Ajouter une section metadata dans le fichier de tâche si elle n'existe pas :
     ```
     metadata:
       feature_branch: <branch_name>
     ```
   - Ne pas modifier le contenu fonctionnel de la tâche
 
-  -- Étape 6 - Commit
-
-  Exécuter la sous-recette `git_commit_push` avec l'action `commit`.
-
-  -- Étape 7 - Finalisation
+  -- Étape 5 - Finalisation
 
   Retourne le message 'tâche terminée' pour passer à l'activité suivante.
 

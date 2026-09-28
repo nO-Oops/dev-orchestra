@@ -19,10 +19,9 @@ instruction: |
   - Les tests générés doivent être : isolés, reproductibles, rapides (<1s)
   - Chaque test doit avoir un nom descriptif et une structure AAA (Arrange-Act-Assert)
   - S'assurer que TOUS les tests passent avant de valider
-  - Écrire l'ensemble des rapports directement au niveau de l'application créée à la racine du projet, dans le dossier '<racine_du_projet_cible>/docs'.
+  - Écrire l'ensemble des rapports directement au niveau de l'application créée à la racine du projet, dans le dossier '<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/tests'.
 
   Prérequis :
-  - Dépôt Git existant et propre
   - Outils de test installés en fonction du ou des langages utilisés (pytest, jest, junit, etc.)
   - Outils de couverture installés en fonction du ou des langages utilisés (coverage, istanbul, jacoco, etc.)
 
@@ -108,13 +107,7 @@ prompt: |
 
   Exécuter la sous-recette `coverage_report`
 
-  -- Étape 8 - Commit
-
-  Exécuter la sous-recette `git_commit_push` avec l'action `commit` :
-  - Format : `test: report`
-  - Vérifier que le commit réussit
-
-  -- Étape 9 - Finalisation
+  -- Étape 8 - Finalisation
 
   Retourne le message 'tâche terminée' pour passer à l'activité suivante.
 

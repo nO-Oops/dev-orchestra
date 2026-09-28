@@ -15,7 +15,7 @@ instruction: |
   - S'assurer que le code est propre, lisible et maintenable
 
   Contraintes obligatoires :
-  - Ne jamais modifier les fichiers sous .goose/ (sauf recipes)
+  - Ne jamais modifier les fichiers sous .goose/
   - Réduire l'impact au minimum : modifier uniquement les fichiers du périmètre validé
   - Ne pas refactorer du code non lié au bug
   - Préserver la rétrocompatibilité et l'architecture existante

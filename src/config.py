@@ -10,13 +10,13 @@ class GooseConfig:
     provider: str = "llm-network"
 
     # Timeouts (durées max d'exécution)
-    plan_timeout: timedelta = timedelta(hours=4)
-    build_timeout: timedelta = timedelta(hours=4)
-    validate_timeout: timedelta = timedelta(hours=4)
-    review_timeout: timedelta = timedelta(hours=4)
-    fix_timeout: timedelta = timedelta(hours=4)
-    test_timeout: timedelta = timedelta(hours=4)
-    doc_timeout: timedelta = timedelta(hours=4)
+    plan_timeout: int = 4
+    build_timeout: int = 4
+    validate_timeout: int = 4
+    review_timeout: int = 4
+    fix_timeout: int = 4
+    test_timeout: int = 5
+    doc_timeout: int = 4
 
     # Retry policy
     max_retries: int = 3

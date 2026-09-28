@@ -16,15 +16,14 @@ instruction: |
 
   Contraintes obligatoires :
   - NE JAMAIS créer de fichier ADR (déjà réalisé dans le workflow)
-  - NE JAMAIS modifier les fichiers sous .goose/ (sauf recipes)
+  - NE JAMAIS modifier les fichiers sous .goose/
   - Respecter la convention Keep a Changelog pour le CHANGELOG
   - Suivre les conventions de documentation du projet
   - Documenter uniquement ce qui est nécessaire (pas de redondance)
   - S'assurer que la documentation reste à jour avec le code
-  - Écrire l'ensemble des rapports directement au niveau de l'application créée, à la racine du projet dans le dossier '<racine_du_projet_cible>/docs'.
+  - Écrire l'ensemble des rapports directement au niveau de l'application créée, à la racine du projet dans le dossier '<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/'.
 
   Prérequis :
-  - Dépôt Git existant et propre
   - Fichier CHANGELOG.md existant (ou créer si absent)
   - Documentation existante à mettre à jour
   - Branche de documentation prête
@@ -53,10 +52,6 @@ sub_recipes:
   - name: doc_validation
     path: ./sub_recipes/doc_validation.yaml
     description: "Validation de la documentation mise à jour"
-
-  - name: git_commit_push
-    path: ./sub_recipes/git_commit_push.yaml
-    description: "Opérations Git standardisées"
 
 prompt: |
   Suivre le flux de travail exactement.
@@ -96,13 +91,7 @@ prompt: |
 
   Exécuter la sous-recette `doc_validation`
 
-  -- Étape 7 - Commit
-
-  Exécuter la sous-recette `git_commit_push` avec l'action `commit` :
-  - Format : `docs: update documentation and changelog`
-  - Vérifier que le commit réussit
-
-  -- Étape 8 - Finalisation
+  -- Étape 7 - Finalisation
 
   Retourne le message 'tâche terminée' pour passer à l'activité suivante.
 

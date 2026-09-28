@@ -1,4 +1,6 @@
 from temporalio.activity import defn
+from src.config import GooseConfig as gc
+
 # src/activities/doc_gen.py
 import logging
 from typing import Dict, Any
@@ -26,19 +28,21 @@ async def run_doc_generation(
     Returns:
         Dict avec doc_generated, doc_path, etc.
     """
-    from src.utils.goose_cli import run_goose_command
+    from src.utils.goose_cli import run_goose_command, build_goose_log_path
 
     logger.info("=== Activity 5: Documentation Generation ===")
     logger.info(f"Output File: {output_file}")
 
     # Exécution de Goose CLI
+    log_file = build_goose_log_path(base_dir, "doc_generation")
     result = await run_goose_command(
         recipe="05-doc_generation.yaml",
         model=model,
         provider=provider,
         cwd=base_dir,
-        timeout=timedelta(hours=3),
+        timeout=timedelta(hours=gc.doc_timeout),
         log_streaming=display_goose_log,
+        log_file=log_file,
     )
 
     return {

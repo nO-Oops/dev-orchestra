@@ -9,11 +9,36 @@ from datetime import timedelta
 
 logger = logging.getLogger(__name__)
 
+
 class GooseCLIError(Exception):
     """Erreur spécifique à Goose CLI"""
     def __init__(self, message: str = "", non_retryable: bool = False):
         self.non_retryable = non_retryable
         super().__init__(message)
+
+
+def build_goose_log_path(base_dir: str, context: str, log_base: Optional[str] = None) -> str:
+    """Construit le chemin du fichier journalisant les sorties de Goose CLI.
+
+    Format resultant : ``<log_base>/<nom du projet>/<context>.log``
+
+    Args:
+        base_dir: Répertoire racine du projet cible (servant à extraire le nom du projet).
+        context: Identifiant unique de l'étape / de la feature
+                 (ex: ``my-feature_plan``, ``review_analysis``). Il garantit
+                 qu'un recipe ne écrase pas le log d'une autre étape.
+        log_base: Répertoire racine des logs. Par défaut, ``<cwd>/tmp`` où <cwd> est le
+                  répertoire de travail de l'outillage (là où le worker / le déclencheur
+                  est lancé). Cela permet de centraliser tous les logs des projets traités
+                  dans un seul dossier ``tmp`` organisé par nom de projet.
+
+    Returns:
+        Chemin absolu vers le fichier log.
+    """
+    project_name = Path(base_dir).name if base_dir else "project"
+    base = Path(log_base) if log_base else Path.cwd() / "tmp"
+    return str(base / project_name / f"{context}.log")
+
 
 async def run_goose_command(
     recipe: str,
@@ -30,7 +55,8 @@ async def run_goose_command(
     # ~9-10 étapes à ~16 tours/étape) en consomment ~150-160. 100 était trop
     # bas et faisait s'arrêter Goose en milieu de workflow (code 0, sans
     # indicateur de complétion). 250 laisse une marge suffisante.
-    max_turns: int = 250,
+    max_turns: int = 500,
+    log_file: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Exécute une commande Goose CLI avec gestion du session-id et des erreurs.
@@ -45,6 +71,11 @@ async def run_goose_command(
         extra_args: Arguments supplémentaires
         log_streaming: Logger les sorties en temps réel (True) ou attendre la fin (False)
         recipes_dir: Chemin vers le répertoire des recipes. Si None, utilise "./.goose/recipes/"
+        log_file: Si fourni, les sorties de Goose (stdout + stderr) sont redirigées vers ce
+                  fichier. Cela empêche Goose d'écrire sur le terminal quel que soit la valeur
+                  de ``log_streaming``. Si ``log_streaming`` est aussi à True, les sorties sont
+                  écrites dans le fichier ET affichées en temps réel. Si ``log_streaming`` est
+                  à False, seules les sorties sont écrites dans le fichier (aucun affichage).
 
     Returns:
         Dict contenant les résultats de l'exécution
@@ -87,61 +118,117 @@ async def run_goose_command(
     logger.info(f"Exécution Goose CLI : {' '.join(cmd)}")
     logger.info(f"CWD: {cwd or '.'}")
 
+    # Préparation du fichier log (redirection des sorties de Goose)
+    log_path: Optional[Path] = None
+    log_handle = None
+    if log_file:
+        log_path = Path(log_file)
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_handle = open(log_path, "w", encoding="utf-8")
+        if not log_streaming:
+            logger.info(f"📄 Logs goose redirigés vers {log_file} (aucun affichage temps réel)")
+        else:
+            logger.info(f"📄 Logs goose écrits dans {log_file} + affichage temps réel")
+
     process = None
     stdout_task: Optional[asyncio.Task] = None
     stderr_task: Optional[asyncio.Task] = None
+    stdout = ""
+    stderr = ""
 
     try:
         # Create a prompt from the recipe instruction if not provided
         prompt = f"Execute recipe: {recipe}"
 
-        process = await asyncio.create_subprocess_exec(
-            *cmd,
-            cwd=cwd,
-            stdin=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-            limit=1024*1024
-        )
+        # === Cas 1 : redirection OS vers un fichier, sans affichage temps réel ===
+        # On branche stdout/stderr de goose DIRECTEMENT sur le fichier : goose ne peut
+        # plus écrire sur le terminal (même via son interface interactive), ce qui garantit
+        # l'absence totale d'affichage quand log_streaming=False.
+        if log_file and not log_streaming:
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                cwd=cwd,
+                stdin=asyncio.subprocess.PIPE,
+                stdout=log_handle,
+                stderr=log_handle,
+            )
 
-        # Collecter les sorties en streaming si demandé
-        stdout_chunks = []
-        stderr_chunks = []
+            if process.stdin is not None:
+                process.stdin.write(prompt.encode('utf-8'))
+                await process.stdin.drain()
+                process.stdin.close()
 
-        async def stream_output(stream, chunks, prefix):
-            """Logger les sorties en temps réel"""
-            while True:
-                line = await stream.readline()
-                if not line:
-                    break
-                decoded = line.decode('utf-8', errors='replace').strip()
-                if decoded:
-                    chunks.append(decoded)
-                    if log_streaming:
-                        logger.info(f"{prefix}: {decoded}")
+            await asyncio.wait_for(process.wait(), timeout=timeout.total_seconds())
 
-        # Lancer les tâches de streaming
-        stdout_task = asyncio.create_task(stream_output(process.stdout, stdout_chunks, "STDOUT"))
-        stderr_task = asyncio.create_task(stream_output(process.stderr, stderr_chunks, "STDERR"))
+            # Fermer l'handle d'écriture, puis relire le fichier pour les
+            # vérifications / le retour (un fichier ouvert en écriture seule
+            # n'est pas lisible).
+            log_handle.flush()
+            log_handle.close()
+            log_handle = None
+            with open(log_path, "r", encoding="utf-8") as read_handle:
+                content = read_handle.read()
+            stdout = stderr = content
 
-        # Envoyer le prompt et attendre la fin
-        if process.stdin is not None:
-            process.stdin.write(prompt.encode('utf-8'))
-            await process.stdin.drain()
-            process.stdin.close()
+        # === Cas 2 : capture PIPE (affichage temps réel / tee vers le fichier) ===
+        else:
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                cwd=cwd,
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                limit=1024*1024
+            )
 
-        # Attendre que le processus se termine
-        await asyncio.wait_for(process.wait(), timeout=timeout.total_seconds())
+            # Collecter les sorties en streaming si demandé
+            stdout_chunks = []
+            stderr_chunks = []
 
-        # Attendre que les tâches de streaming se terminent
-        await asyncio.gather(stdout_task, stderr_task)
+            async def stream_output(stream, chunks, prefix):
+                """Logger les sorties en temps réel (et les écrire dans le fichier si demandé)"""
+                while True:
+                    line = await stream.readline()
+                    if not line:
+                        break
+                    decoded = line.decode('utf-8', errors='replace')
+                    if decoded:
+                        chunks.append(decoded)
+                        # Écrire dans le fichier log si un chemin est fourni
+                        if log_handle is not None:
+                            try:
+                                log_handle.write(decoded + "\n")
+                                log_handle.flush()
+                            except ValueError:
+                                # Fichier déjà fermé -> ignorer
+                                pass
+                        if log_streaming:
+                            logger.info(f"{prefix}: {decoded}")
 
-        stdout = '\n'.join(stdout_chunks)
-        stderr = '\n'.join(stderr_chunks)
+            # Lancer les tâches de streaming
+            stdout_task = asyncio.create_task(stream_output(process.stdout, stdout_chunks, "STDOUT"))
+            stderr_task = asyncio.create_task(stream_output(process.stderr, stderr_chunks, "STDERR"))
+
+            # Envoyer le prompt et attendre la fin
+            if process.stdin is not None:
+                process.stdin.write(prompt.encode('utf-8'))
+                await process.stdin.drain()
+                process.stdin.close()
+
+            # Attendre que le processus se termine
+            await asyncio.wait_for(process.wait(), timeout=timeout.total_seconds())
+
+            # Attendre que les tâches de streaming se terminent
+            await asyncio.gather(stdout_task, stderr_task)
+
+            stdout = '\n'.join(stdout_chunks)
+            stderr = '\n'.join(stderr_chunks)
 
         # Vérifier le code de retour
         if process.returncode != 0:
             error_msg = f"Goose CLI failed with exit code {process.returncode}\nSTDERR: {stderr}"
+            if log_file:
+                error_msg += f"\n(Log complet disponible dans : {log_file})"
             logger.error(error_msg)
             raise GooseCLIError(error_msg)
 
@@ -179,6 +266,8 @@ async def run_goose_command(
                 f"Goose CLI bloqué : prérequis non satisfait (phrase détectée : '{blocking_phrase}')\n"
                 f"OUTPUT: {stdout}\nSTDERR: {stderr}"
             )
+            if log_file:
+                error_msg += f"\n(Log complet disponible dans : {log_file})"
             logger.error(error_msg)
             raise GooseCLIError(
                 f"Prérequis non satisfaits : Goose a arrêté le workflow à l'étape de "
@@ -219,6 +308,8 @@ async def run_goose_command(
                 f"Output length: {len(stdout)} chars\n"
                 f"Last 1000 chars: {stdout[-1000:] if stdout else 'empty'}\n"
             )
+            if log_file:
+                error_msg += f"\n(Log complet disponible dans : {log_file})"
             logger.error(error_msg)
             raise GooseCLIError(
                 f"Workflow incomplet : Goose s'est arrêté avant la fin. {error_msg}",
@@ -237,6 +328,8 @@ async def run_goose_command(
 
     except asyncio.TimeoutError:
         error_msg = f"Goose CLI timed out after {timeout}"
+        if log_file:
+            error_msg += f"\n(Log complet disponible dans : {log_file})"
         logger.error(error_msg)
         # En cas de timeout, on tue le processus
         if process is not None and process.returncode is None:
@@ -252,3 +345,9 @@ async def run_goose_command(
             stdout_task.cancel()
         if stderr_task is not None and not stderr_task.done():
             stderr_task.cancel()
+        # Fermer proprement le fichier log
+        if log_handle is not None:
+            try:
+                log_handle.close()
+            except ValueError:
+                pass

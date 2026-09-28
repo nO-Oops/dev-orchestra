@@ -1,4 +1,6 @@
 from temporalio.activity import defn
+from src.config import GooseConfig as gc
+
 # src/activities/fix.py
 import logging
 from typing import Dict, Any
@@ -26,18 +28,20 @@ async def run_review_fix(
     Returns:
         Dict avec le résultat de la correction
     """
-    from src.utils.goose_cli import run_goose_command
+    from src.utils.goose_cli import run_goose_command, build_goose_log_path
 
     logger.info("=== Activity 3: Review Fix ===")
 
     # Exécution de Goose CLI (pas de gestion de session goose : --name / --resume supprimés)
+    log_file = build_goose_log_path(base_dir, "review_fix")
     result = await run_goose_command(
         recipe="02-2-review_fix.yaml",
         model=model,
         provider=provider,
         cwd=base_dir,
-        timeout=timedelta(hours=3),
+        timeout=timedelta(hours=gc.fix_timeout),
         log_streaming=display_goose_log,
+        log_file=log_file,
     )
 
     return {

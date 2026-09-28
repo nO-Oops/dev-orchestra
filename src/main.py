@@ -6,6 +6,7 @@ from activities.feature_plan import run_feature_plan
 from temporalio.client import Client
 from temporalio.worker import Worker
 from src.workflow import develop_feature_pipeline
+from src.logging_setup import configure_logging
 from src.activities.feature_plan import run_feature_plan
 from src.activities.feature_build import run_feature_build
 from src.activities.feature_validate import run_feature_validate
@@ -13,9 +14,9 @@ from src.activities.review_analyse import run_review_analysis
 from src.activities.review_fix import run_review_fix
 from src.activities.test_generate import run_test_generation
 from src.activities.doc_generate import run_doc_generation
-from src.activities.file_operations import move_prompt_to_directory, check_prompt_state
+from src.activities.file_operations import move_prompt_to_directory, check_prompt_state, git_commit_after_move, create_feature_branch
 
-logging.basicConfig(level=logging.INFO)
+configure_logging()
 logger = logging.getLogger(__name__)
 
 async def main():
@@ -33,6 +34,8 @@ async def main():
         run_doc_generation,
         move_prompt_to_directory,
         check_prompt_state,
+        git_commit_after_move,
+        create_feature_branch,
     ]
 
     # Créer le worker
