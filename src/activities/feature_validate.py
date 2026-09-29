@@ -7,7 +7,7 @@ from datetime import timedelta
 from typing import Any, Dict
 
 from temporalio import activity
-from src.config import GooseConfig as gc
+from src.config import gc
 
 logger = logging.getLogger(__name__)
 

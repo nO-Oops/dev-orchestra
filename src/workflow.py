@@ -6,7 +6,7 @@ from temporalio import workflow
 from temporalio.common import RetryPolicy
 
 # Imports des activities au niveau module (obligatoire pour Temporal sandbox)
-from src.config import GooseConfig as gc
+from src.config import gc
 from src.activities.feature_plan import run_feature_plan
 from src.activities.feature_build import run_feature_build
 from src.activities.feature_validate import run_feature_validate

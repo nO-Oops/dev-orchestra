@@ -25,17 +25,21 @@ from temporalio.common import WorkflowIDReusePolicy
 from temporalio.exceptions import WorkflowAlreadyStartedError
 
 from src.logging_setup import configure_logging
+from src.config import gc, tc, _require_int
 
 configure_logging()
 logger = logging.getLogger(__name__)
 
-# Configuration par défaut
-DEFAULT_MODEL = "Qwen3.6-35B-A3B-6bit"
-DEFAULT_PROVIDER = "llm-local"
-DEFAULT_TEMPORAL_HOST = "localhost"
-DEFAULT_TEMPORAL_PORT = 7233
-DEFAULT_TASK_QUEUE = "goose-pipeline-queue"
-DEFAULT_MAX_CONCURRENCY = 1
+# Valeurs par défaut UNIFIÉES : la source de vérité unique est src/config.py
+# (singletons gc / tc), elles-mêmes surchargeables via le fichier .env.
+# Le modèle/ provider du déclencheur ne diffèrent plus de ceux du pipeline.
+DEFAULT_MODEL = gc.model
+DEFAULT_PROVIDER = gc.provider
+DEFAULT_TEMPORAL_HOST = tc.host
+DEFAULT_TEMPORAL_PORT = tc.port
+DEFAULT_TASK_QUEUE = tc.task_queue
+# Valeurs obligatoires (aucun défaut codé en dur) : issues du fichier .env.
+DEFAULT_MAX_CONCURRENCY = _require_int("MAX_CONCURRENCY")
 
 # Dossiers de prompts actifs parcourus dans l'ordre de priorité.
 PROMPT_SUBFOLDERS = (
@@ -92,7 +96,7 @@ async def main():
     parser.add_argument("--max-concurrency", "-c", type=int, default=DEFAULT_MAX_CONCURRENCY, help="Nombre max de workflows simultanés")
     parser.add_argument("--dry-run", action="store_true", help="Liste les prompts sans lancer les workflows")
     parser.add_argument("--recipes-dir", "-rd", default=None, help="Chemin vers le répertoire des recipes (ex: /path/to/DevOrchestra/.goose/recipes)")
-    parser.add_argument("--max-turns", "-mt", type=int, default=300, help="Nombre maximum d'actions (tournées) Goose CLI")
+    parser.add_argument("--max-turns", "-mt", type=int, default=_require_int("MAX_TURNS"), help="Nombre maximum d'actions (tournées) Goose CLI")
     parser.add_argument("--session-id", "-si", default=None, help="Session ID à transmettre aux activités (généré automatiquement si absent)")
     parser.add_argument(
         "--display-goose-log",

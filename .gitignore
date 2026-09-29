@@ -2,5 +2,8 @@ __pycache__
 
 src/goose_temporal*
 
+# Configuration locale (valeurs spécifiques à l'environnement)
+.env
+
 # Logs des exécutions Goose CLI (redirigés ici via --no-display-goose-log)
 tmp/

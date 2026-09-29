@@ -1,5 +1,5 @@
 from temporalio.activity import defn
-from src.config import GooseConfig as gc
+from src.config import gc
 
 # src/activities/review.py
 import logging
@@ -34,7 +34,7 @@ async def run_review_analysis(
 
 
     # Exécution de Goose CLI
-    log_file = build_goose_log_path(base_dir, "review_analysis")
+    log_file = build_goose_log_path(base_dir, f"{feature_name}_review_analysis")
     result = await run_goose_command(
         recipe="02-1-review_analysis.yaml",
         model=model,

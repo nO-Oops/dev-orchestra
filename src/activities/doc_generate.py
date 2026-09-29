@@ -1,5 +1,5 @@
 from temporalio.activity import defn
-from src.config import GooseConfig as gc
+from src.config import gc
 
 # src/activities/doc_gen.py
 import logging
@@ -34,7 +34,7 @@ async def run_doc_generation(
     logger.info(f"Output File: {output_file}")
 
     # Exécution de Goose CLI
-    log_file = build_goose_log_path(base_dir, "doc_generation")
+    log_file = build_goose_log_path(base_dir, f"{feature_name}_doc_generation")
     result = await run_goose_command(
         recipe="05-doc_generation.yaml",
         model=model,

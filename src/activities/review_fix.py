@@ -1,5 +1,5 @@
 from temporalio.activity import defn
-from src.config import GooseConfig as gc
+from src.config import gc
 
 # src/activities/fix.py
 import logging
@@ -33,7 +33,7 @@ async def run_review_fix(
     logger.info("=== Activity 3: Review Fix ===")
 
     # Exécution de Goose CLI (pas de gestion de session goose : --name / --resume supprimés)
-    log_file = build_goose_log_path(base_dir, "review_fix")
+    log_file = build_goose_log_path(base_dir, f"{feature_name}_review_fix")
     result = await run_goose_command(
         recipe="02-2-review_fix.yaml",
         model=model,

@@ -1,5 +1,5 @@
 from temporalio.activity import defn
-from src.config import GooseConfig as gc
+from src.config import gc
 
 import logging
 from typing import Dict, Any
@@ -33,7 +33,7 @@ async def run_test_generation(
     logger.info(f"Output File: {output_file}")
 
     # Exécution de Goose CLI
-    log_file = build_goose_log_path(base_dir, "test_generation")
+    log_file = build_goose_log_path(base_dir, f"{feature_name}_test_generation")
     result = await run_goose_command(
         recipe="04-test_generation.yaml",
         model=model,
