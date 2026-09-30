@@ -253,7 +253,7 @@ class develop_feature_pipeline:
             logger.info("=== Étape 2.1 : Analyse de la branche courante ===")
             review_result = await workflow.execute_activity(
                 run_review_analysis,
-                args=[base_dir, model, provider, display_goose_log],
+                args=[feature_name, base_dir, model, provider, display_goose_log],
                 start_to_close_timeout=timedelta(hours=gc.review_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
@@ -265,7 +265,7 @@ class develop_feature_pipeline:
             logger.info("=== Étape 2.2: Correction de la branche courante ===")
             fix_result = await workflow.execute_activity(
                 run_review_fix,
-                args=[base_dir, model, provider, None, display_goose_log],
+                args=[feature_name, base_dir, model, provider, None, display_goose_log],
                 start_to_close_timeout=timedelta(hours=gc.fix_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
@@ -321,7 +321,7 @@ class develop_feature_pipeline:
             logger.info("=== Étape 3 : Génération des tests ===")
             test_result = await workflow.execute_activity(
                 run_test_generation,
-                args=[state["path"], base_dir, model, provider, display_goose_log],
+                args=[feature_name, state["path"], base_dir, model, provider, display_goose_log],
                 start_to_close_timeout=timedelta(hours=gc.test_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,
@@ -336,18 +336,18 @@ class develop_feature_pipeline:
             logger.info("=== Déplacement du prompt de to_do_test_generate vers to_do_doc_generate ===")
             move_result = await workflow.execute_activity(
                 move_prompt_to_directory,
-                args=[base_dir, feature_name, "to_do_test_generate", "to_do_merge"],
+                args=[base_dir, feature_name, "to_do_test_generate", "to_do_doc_generate"],
                 start_to_close_timeout=timedelta(minutes=5),
             )
 
             error_move = move_result.get("error", "pas de message d'erreur")
             if move_result["move_success"]:
-                logger.info(f"Prompt file '{feature_name}.yml' déplacé de to_do_test_generate vers to_do_merge.")
+                logger.info(f"Prompt file '{feature_name}.yml' déplacé de to_do_test_generate vers to_do_doc_generate.")
 
                 # Commit git après le déplacement réussi
                 commit_result = await workflow.execute_activity(
                     git_commit_after_move,
-                    args=[base_dir, feature_name, "to_do_test_generate", "to_do_merge"],
+                    args=[base_dir, feature_name, "to_do_test_generate", "to_do_doc_generate"],
                     start_to_close_timeout=timedelta(minutes=5),
                 )
                 if commit_result["commit_success"]:
@@ -376,7 +376,7 @@ class develop_feature_pipeline:
             logger.info("=== Étape 4 : Génération de la documentation ===")
             doc_result = await workflow.execute_activity(
                 run_doc_generation,
-                args=[state["path"], base_dir, model, provider, display_goose_log],
+                args=[feature_name, state["path"], base_dir, model, provider, display_goose_log],
                 start_to_close_timeout=timedelta(hours=gc.doc_timeout),
                 retry_policy=RetryPolicy(
                     maximum_attempts=gc.max_retries,

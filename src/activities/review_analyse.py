@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 @defn
 async def run_review_analysis(
+    feature_name: str,
     base_dir: str,
     model: str,
     provider: str,

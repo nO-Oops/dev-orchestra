@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 @defn
 async def run_doc_generation(
+    feature_name: str,
     output_file: str,
     base_dir: str,
     model: str,
