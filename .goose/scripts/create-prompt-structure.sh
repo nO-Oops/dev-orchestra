@@ -4,18 +4,20 @@ set -e
 while getopts d: param
 do
     case "${param}" in
-        d) directory=${OPTARG};
+        d) PROJECT_DIRECTORY=${OPTARG};
     esac
 done
 
-PROMPT_DIRECTORY="$directory/.goose/prompts"
+PROMPT_DIRECTORY="$PROJECT_DIRECTORY/.goose/prompts"
 KEEP_DIR_FILE=.keep_dir
+
+mkdir -p "$PROJECT_DIRECTORY/.goose/backlog"
+touch "$PROJECT_DIRECTORY/.goose/backlog/$KEEP_DIR_FILE"
 
 mkdir -p $PROMPT_DIRECTORY
 cd $PROMPT_DIRECTORY
 
 mkdir -p \
-    00_prepare \
     to_close \
     to_do_doc_generate \
     to_do_feature_build \
@@ -27,7 +29,6 @@ mkdir -p \
     to_merge
 
 touch \
-    "00_prepare/$KEEP_DIR_FILE" \
     "to_close/$KEEP_DIR_FILE" \
     "to_do_doc_generate/$KEEP_DIR_FILE" \
     "to_do_feature_build/$KEEP_DIR_FILE" \

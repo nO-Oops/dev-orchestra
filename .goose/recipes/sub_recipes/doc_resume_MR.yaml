@@ -1,0 +1,23 @@
+version: 1.0.0
+title: Create merge request Documentation
+description: Création d'un document résumant les fonctionnalités et tâches effectuées
+
+instruction: |
+  Création du document au format markdown
+
+prompt: |
+
+  -- Étape 1 - Identification des ajouts et modifications liés à la mise en place des fonctionnalités
+
+  Selon le plan de documentation, identifier :
+  - Les fichiers de code avec fonctions modifiées
+  - Les fichiers de code avec nouvelles fonctions
+
+  -- Étape 2 - Création du fichier
+
+  Créer le fichier `<racine_du_projet_cible>/docs/generated_features/<feature_task_name>/merge-request/mr-<feature_task_name>.md` et ajouter le contenu du résumé
+
+  -- Livrable
+
+  Confirmer :
+  - le ficher mr-<feature_task_name>.md

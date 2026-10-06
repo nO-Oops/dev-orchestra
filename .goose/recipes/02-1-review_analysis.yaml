@@ -8,8 +8,7 @@ instruction: |
   Tu ne dois pas modifier les fichiers de l'application.
   Tu rédigera l'analyse à ajouter dans le dossier docs. Utilise la branche <branch name value>
   Tu devrais formuler des suggestions concernant les options à choisir.
-  Ne pas examiner les fichiers des répertoires 00-prepare, to_do_feature_plan, 04-close
-  Privilégie la lecture des fichiers locaux plutôt que ceux du dépôt Git distant
+  Privilégie la lecture des fichiers locaux
 
   Contraintes obligatoires :
   Enregistrer tous les fichiers liés à la documentation dans le dossier <racine_du_projet_cible>/docs

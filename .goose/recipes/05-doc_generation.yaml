@@ -53,19 +53,15 @@ sub_recipes:
     path: ./sub_recipes/doc_validation.yaml
     description: "Validation de la documentation mise à jour"
 
+  - name: doc_resume_MR
+    path: ./sub_recipes/doc_resume_MR.yaml
+    description: "Documentation de la merge request"
+
 prompt: |
   Suivre le flux de travail exactement.
 
   Exécuter toutes les sous-recettes et consolider les résultats.
   Utiliser la valeur du nom de branche définie dans le fichier .goose/prompts/to_do_doc_generate sous le nom 'feature_branch'
-
-  -- Étape 0 - Validation des prérequis
-
-  Vérifier :
-  Les outils de test et couverture sont installés
-  .goose/prompts/to_do_doc_generate exists avec au moins un fichier *.yaml, *.yml ou *.md de disponible-
-
-  Arrêter immédiatement et signaler tout prérequis manquant.
 
   -- Étape 1 - Analyse des différences
 
@@ -90,6 +86,10 @@ prompt: |
   -- Étape 6 - Validation
 
   Exécuter la sous-recette `doc_validation`
+
+  -- Étape 7 - Création du résumé de la merge request
+
+  Exécuter la sous-recette `doc_resume_MR`
 
   -- Étape 7 - Finalisation
 
