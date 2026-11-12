@@ -420,10 +420,10 @@ class develop_feature_pipeline:
             # Le prompt n'est pas en 03-to_validate : on saute les dernières (étapes 4 et 5) pour finaliser le processus.
             logger.info("Étape 5: Le prompt n'est pas dans le dossier to_do_doc_generate, fin du processus")
 
+        logger.info("=== Pipeline Completed Successfully ===")
+
         # Check if lock_trigger exists before remove it
         lock_trigger_position = str(Path().resolve().parent) + "/lock_trigger"
         if os.path.isfile(lock_trigger_position):
             os.remove(lock_trigger_position)  # Remove the file
             print(f"Deleted file: {lock_trigger_position}")
-
-        logger.info("=== Pipeline Completed Successfully ===")
