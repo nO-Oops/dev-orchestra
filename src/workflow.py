@@ -426,4 +426,6 @@ class develop_feature_pipeline:
         lock_trigger_position = str(Path().resolve().parent) + "/lock_trigger"
         if os.path.isfile(lock_trigger_position):
             os.remove(lock_trigger_position)  # Remove the file
-            print(f"Deleted file: {lock_trigger_position}")
+            logger.info(f"Deleted file: {lock_trigger_position}")
+        else:
+            logger.warning(f"File lock_trigger not found -> {lock_trigger_position}")
