@@ -8,6 +8,10 @@ réglage doit être présent dans ``.env`` (ou dans l'environnement). Si une val
 manque, une ``ConfigurationError`` est levée au démarrage (fail-fast) afin de
 forcer la complétion du fichier de configuration.
 
+Les chemins du projet cible et des prompts sont déterminés à l'exécution par
+``trigger_pipeline.py``. Le répertoire des recipes peut être fourni par
+``--recipes-dir`` / ``GOOSE_RECIPES_DIR`` ou calculé par le déclencheur.
+
 Hiérarchie de priorité (de la plus forte à la plus faible) :
 
   1. Variables d'environnement réelles (``os.environ``).
@@ -116,8 +120,10 @@ def _require_float(key: str) -> float:
 class GooseConfig:
     """Configuration pour les appels Goose CLI et le pipeline.
 
-    Construit exclusivement à partir de l'environnement via ``from_env()`` :
-    aucun champ n'a de valeur par défaut.
+    Contient uniquement les paramètres globaux du moteur Goose et du pipeline.
+    Les paramètres propres à une exécution (projet, recipes, nombre de tours,
+    modèle/provider éventuellement surchargés) sont transmis au workflow par
+    trigger_pipeline.py et ne doivent pas être exigés ici.
     """
 
     # Modèle / provider
@@ -138,11 +144,6 @@ class GooseConfig:
     retry_initial_interval: timedelta
     retry_backoff_coefficient: float
 
-    # Chemins
-    base_dir: str
-    prompts_dir: str
-    goose_recipes_dir: str
-
     @classmethod
     def from_env(cls) -> "GooseConfig":
         """Construit la config à partir de l'environnement (valeurs obligatoires)."""
@@ -161,9 +162,6 @@ class GooseConfig:
                 seconds=_require_int("RETRY_INITIAL_INTERVAL_SECONDS")
             ),
             retry_backoff_coefficient=_require_float("RETRY_BACKOFF_COEFFICIENT"),
-            base_dir=_require("BASE_DIR"),
-            prompts_dir=_require("PROMPTS_DIR"),
-            goose_recipes_dir=_require("GOOSE_RECIPES_DIR"),
         )
 
 

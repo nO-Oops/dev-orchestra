@@ -16,6 +16,7 @@ Usage:
 import argparse
 import asyncio
 import logging
+import os
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -38,8 +39,11 @@ DEFAULT_PROVIDER = gc.provider
 DEFAULT_TEMPORAL_HOST = tc.host
 DEFAULT_TEMPORAL_PORT = tc.port
 DEFAULT_TASK_QUEUE = tc.task_queue
-# Valeurs obligatoires (aucun défaut codé en dur) : issues du fichier .env.
+# Paramètres de lancement : valeurs par défaut issues de .env, surchargeables
+# par les arguments CLI. Les chemins de projet/prompts restent dynamiques.
 DEFAULT_MAX_CONCURRENCY = _require_int("MAX_CONCURRENCY")
+DEFAULT_MAX_TURNS = _require_int("MAX_TURNS")
+DEFAULT_RECIPES_DIR = os.environ.get("GOOSE_RECIPES_DIR") or None
 
 # Dossiers de prompts actifs parcourus dans l'ordre de priorité.
 PROMPT_SUBFOLDERS = (
@@ -95,8 +99,8 @@ async def main():
     parser.add_argument("--task-queue", "-tq", default=DEFAULT_TASK_QUEUE, help="Task Queue Temporal")
     parser.add_argument("--max-concurrency", "-c", type=int, default=DEFAULT_MAX_CONCURRENCY, help="Nombre max de workflows simultanés")
     parser.add_argument("--dry-run", action="store_true", help="Liste les prompts sans lancer les workflows")
-    parser.add_argument("--recipes-dir", "-rd", default=None, help="Chemin vers le répertoire des recipes (ex: /path/to/DevOrchestra/.goose/recipes)")
-    parser.add_argument("--max-turns", "-mt", type=int, default=_require_int("MAX_TURNS"), help="Nombre maximum d'actions (tournées) Goose CLI")
+    parser.add_argument("--recipes-dir", "-rd", default=DEFAULT_RECIPES_DIR, help="Chemin vers le répertoire des recipes (défaut : GOOSE_RECIPES_DIR ou chemin calculé)")
+    parser.add_argument("--max-turns", "-mt", type=int, default=DEFAULT_MAX_TURNS, help="Nombre maximum d'actions (tournées) Goose CLI")
     parser.add_argument("--session-id", "-si", default=None, help="Session ID à transmettre aux activités (généré automatiquement si absent)")
     parser.add_argument(
         "--display-goose-log",
