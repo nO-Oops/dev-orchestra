@@ -3,10 +3,11 @@
 Source de vérité unique : le fichier ``.env`` (à la racine du projet) et, en cas
 de priorité supérieure, les variables d'environnement réelles (``os.environ``).
 
-L'application ne possède **aucune valeur par défaut codée en dur** : chaque
-réglage doit être présent dans ``.env`` (ou dans l'environnement). Si une valeur
-manque, une ``ConfigurationError`` est levée au démarrage (fail-fast) afin de
-forcer la complétion du fichier de configuration.
+Les paramètres globaux nécessaires au moteur Goose et à Temporal sont lus
+depuis ``.env`` ou l'environnement. Les paramètres propres à une exécution,
+notamment le répertoire du projet (``BASE_DIR``), ne sont jamais requis ici :
+le chemin du projet est fourni au lancement par ``trigger_pipeline.py`` via
+l'argument ``--project`` puis transmis au workflow.
 
 Les chemins du projet cible et des prompts sont déterminés à l'exécution par
 ``trigger_pipeline.py``. Le répertoire des recipes peut être fourni par
@@ -46,10 +47,10 @@ except Exception:  # pragma: no cover - cas où dotenv est absent
 
 
 class ConfigurationError(RuntimeError):
-    """Levée lorsqu'une valeur de configuration est absente de l'environnement.
+    """Levée lorsqu'un paramètre global obligatoire manque à l'environnement.
 
-    Il n'existe aucune valeur par défaut : toute la configuration doit provenir
-    du fichier ``.env`` (ou des variables d'environnement).
+    Les paramètres d'exécution tels que BASE_DIR ne relèvent pas de cette
+    configuration et ne doivent jamais être recherchés dans le fichier .env.
     """
 
 
@@ -146,7 +147,7 @@ class GooseConfig:
 
     @classmethod
     def from_env(cls) -> "GooseConfig":
-        """Construit la config à partir de l'environnement (valeurs obligatoires)."""
+        """Construit la configuration globale Goose, sans chemin de projet."""
         return cls(
             model=_require("GOOSE_MODEL"),
             provider=_require("GOOSE_PROVIDER"),
