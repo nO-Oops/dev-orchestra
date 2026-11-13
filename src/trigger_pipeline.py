@@ -65,11 +65,14 @@ async def start_single_workflow(
     max_turns: int,
     display_goose_log: bool,
     semaphore: asyncio.Semaphore,
-) -> str | None:
+    lock_trigger_path: str,
+) -> object | None:
     """Démarre un workflow pour un prompt unique avec contrôle de concurrence."""
     async with semaphore:
         workflow_id = f"feature-{feature_name}-{uuid.uuid4().hex[:8]}"
         try:
+            # Le verrou est global au déclenchement : il ne doit pas être transmis
+            # aux workflows individuels, qui peuvent être rejoués ou tourner en parallèle.
             args = [feature_name, base_dir, model, provider, recipes_dir or "", str(max_turns), display_goose_log]
             handle = await client.start_workflow(
                 "develop_feature_pipeline",
@@ -79,7 +82,7 @@ async def start_single_workflow(
                 id_reuse_policy=WorkflowIDReusePolicy.ALLOW_DUPLICATE_FAILED_ONLY,
             )
             logger.info(f"✅ Workflow lancé  | ID: {handle.id} | Feature: {feature_name}")
-            return handle.id
+            return handle
         except WorkflowAlreadyStartedError:
             logger.warning(f"⏳ Workflow déjà en cours pour {feature_name}, skip.")
             return None
@@ -161,6 +164,10 @@ async def main():
 
     logger.info(f"✅ Connecté. Task Queue: {args.task_queue}")
 
+    # Chemin explicite du verrou : le worker Temporal peut avoir un CWD différent
+    # de celui du processus qui déclenche le pipeline.
+    lock_trigger_path = str(Path.cwd().resolve().parent / "lock_trigger")
+
     # Lancement des workflows avec contrôle de concurrence
     semaphore = asyncio.Semaphore(args.max_concurrency)
 
@@ -170,22 +177,57 @@ async def main():
         # Par défaut, utiliser les recipes du projet DevOrchestra (parent du projet cible)
         recipes_dir = f"{base_dir.parent}/DevOrchestra/.goose/recipes"
 
-    for prompt_file in prompt_files:
-        feature_name = prompt_file.stem
-        await start_single_workflow(
-            client=client,
-            feature_name=feature_name,
-            base_dir=str(base_dir),
-            model=args.model,
-            provider=args.provider,
-            recipes_dir=recipes_dir,
-            max_turns=args.max_turns,
-            display_goose_log=args.display_goose_log,
-            semaphore=semaphore,
-        )
+    workflow_handles = []
+    failed_workflows = []
+    try:
+        for prompt_file in prompt_files:
+            feature_name = prompt_file.stem
+            handle = await start_single_workflow(
+                client=client,
+                feature_name=feature_name,
+                base_dir=str(base_dir),
+                model=args.model,
+                provider=args.provider,
+                recipes_dir=recipes_dir,
+                max_turns=args.max_turns,
+                display_goose_log=args.display_goose_log,
+                semaphore=semaphore,
+                lock_trigger_path=lock_trigger_path,
+            )
+            if handle is not None:
+                workflow_handles.append(handle)
 
-    logger.info(f"📊 Résumé: {len(prompt_files)} prompt(s) scanné(s) → workflows déclenchés")
-    return 0
+        logger.info(
+            "⏳ Attente de la fin définitive de %s workflow(s) (retries Temporal inclus)...",
+            len(workflow_handles),
+        )
+        # handle.result() ne se termine qu'à l'état terminal du workflow : les
+        # retries d'activités configurés dans le workflow sont donc épuisés.
+        results = await asyncio.gather(
+            *(handle.result() for handle in workflow_handles),
+            return_exceptions=True,
+        )
+        for handle, result in zip(workflow_handles, results):
+            if isinstance(result, BaseException):
+                failed_workflows.append(handle.id)
+                logger.error("❌ Workflow terminé en échec | ID: %s | %s", handle.id, result)
+            else:
+                logger.info("🏁 Workflow terminé | ID: %s", handle.id)
+
+        logger.info(
+            "📊 Résumé: %s prompt(s) scanné(s), %s workflow(s) terminé(s), %s échec(s)",
+            len(prompt_files), len(workflow_handles), len(failed_workflows),
+        )
+        return 1 if failed_workflows else 0
+    finally:
+        # Suppression unique, uniquement après la terminaison de TOUS les
+        # workflows lancés. Elle n'est jamais exécutée par une activité rejouable.
+        lock_path = Path(lock_trigger_path)
+        try:
+            lock_path.unlink(missing_ok=True)
+            logger.info("🧹 Fichier lock_trigger supprimé après la fin de tous les workflows : %s", lock_path)
+        except OSError:
+            logger.exception("❌ Impossible de supprimer le fichier lock_trigger : %s", lock_path)
 
 
 if __name__ == "__main__":
