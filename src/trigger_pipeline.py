@@ -16,6 +16,7 @@ Usage:
 import argparse
 import asyncio
 import logging
+import os
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -38,8 +39,11 @@ DEFAULT_PROVIDER = gc.provider
 DEFAULT_TEMPORAL_HOST = tc.host
 DEFAULT_TEMPORAL_PORT = tc.port
 DEFAULT_TASK_QUEUE = tc.task_queue
-# Valeurs obligatoires (aucun défaut codé en dur) : issues du fichier .env.
+# Paramètres de lancement : valeurs par défaut issues de .env, surchargeables
+# par les arguments CLI. Les chemins de projet/prompts restent dynamiques.
 DEFAULT_MAX_CONCURRENCY = _require_int("MAX_CONCURRENCY")
+DEFAULT_MAX_TURNS = _require_int("MAX_TURNS")
+DEFAULT_RECIPES_DIR = os.environ.get("GOOSE_RECIPES_DIR") or None
 
 # Dossiers de prompts actifs parcourus dans l'ordre de priorité.
 PROMPT_SUBFOLDERS = (
@@ -61,11 +65,14 @@ async def start_single_workflow(
     max_turns: int,
     display_goose_log: bool,
     semaphore: asyncio.Semaphore,
-) -> str | None:
+    lock_trigger_path: str,
+) -> object | None:
     """Démarre un workflow pour un prompt unique avec contrôle de concurrence."""
     async with semaphore:
         workflow_id = f"feature-{feature_name}-{uuid.uuid4().hex[:8]}"
         try:
+            # Le verrou est global au déclenchement : il ne doit pas être transmis
+            # aux workflows individuels, qui peuvent être rejoués ou tourner en parallèle.
             args = [feature_name, base_dir, model, provider, recipes_dir or "", str(max_turns), display_goose_log]
             handle = await client.start_workflow(
                 "develop_feature_pipeline",
@@ -75,7 +82,7 @@ async def start_single_workflow(
                 id_reuse_policy=WorkflowIDReusePolicy.ALLOW_DUPLICATE_FAILED_ONLY,
             )
             logger.info(f"✅ Workflow lancé  | ID: {handle.id} | Feature: {feature_name}")
-            return handle.id
+            return handle
         except WorkflowAlreadyStartedError:
             logger.warning(f"⏳ Workflow déjà en cours pour {feature_name}, skip.")
             return None
@@ -95,8 +102,8 @@ async def main():
     parser.add_argument("--task-queue", "-tq", default=DEFAULT_TASK_QUEUE, help="Task Queue Temporal")
     parser.add_argument("--max-concurrency", "-c", type=int, default=DEFAULT_MAX_CONCURRENCY, help="Nombre max de workflows simultanés")
     parser.add_argument("--dry-run", action="store_true", help="Liste les prompts sans lancer les workflows")
-    parser.add_argument("--recipes-dir", "-rd", default=None, help="Chemin vers le répertoire des recipes (ex: /path/to/DevOrchestra/.goose/recipes)")
-    parser.add_argument("--max-turns", "-mt", type=int, default=_require_int("MAX_TURNS"), help="Nombre maximum d'actions (tournées) Goose CLI")
+    parser.add_argument("--recipes-dir", "-rd", default=DEFAULT_RECIPES_DIR, help="Chemin vers le répertoire des recipes (défaut : GOOSE_RECIPES_DIR ou chemin calculé)")
+    parser.add_argument("--max-turns", "-mt", type=int, default=DEFAULT_MAX_TURNS, help="Nombre maximum d'actions (tournées) Goose CLI")
     parser.add_argument("--session-id", "-si", default=None, help="Session ID à transmettre aux activités (généré automatiquement si absent)")
     parser.add_argument(
         "--display-goose-log",
@@ -157,6 +164,10 @@ async def main():
 
     logger.info(f"✅ Connecté. Task Queue: {args.task_queue}")
 
+    # Chemin explicite du verrou : le worker Temporal peut avoir un CWD différent
+    # de celui du processus qui déclenche le pipeline.
+    lock_trigger_path = str(Path.cwd().resolve().parent / "lock_trigger")
+
     # Lancement des workflows avec contrôle de concurrence
     semaphore = asyncio.Semaphore(args.max_concurrency)
 
@@ -166,9 +177,12 @@ async def main():
         # Par défaut, utiliser les recipes du projet DevOrchestra (parent du projet cible)
         recipes_dir = f"{base_dir.parent}/DevOrchestra/.goose/recipes"
 
+    workflow_handles = []
+    failed_workflows = []
+
     for prompt_file in prompt_files:
         feature_name = prompt_file.stem
-        await start_single_workflow(
+        handle = await start_single_workflow(
             client=client,
             feature_name=feature_name,
             base_dir=str(base_dir),
@@ -178,10 +192,46 @@ async def main():
             max_turns=args.max_turns,
             display_goose_log=args.display_goose_log,
             semaphore=semaphore,
+            lock_trigger_path=lock_trigger_path,
         )
+        if handle is not None:
+            workflow_handles.append(handle)
 
-    logger.info(f"📊 Résumé: {len(prompt_files)} prompt(s) scanné(s) → workflows déclenchés")
-    return 0
+    logger.info(
+        "⏳ Attente de la fin définitive de %s workflow(s) (retries Temporal inclus)...",
+        len(workflow_handles),
+    )
+    # handle.result() ne se termine qu'à l'état terminal du workflow : les
+    # retries d'activités configurés dans le workflow sont donc épuisés.
+    # Si le déclencheur est annulé/interrompu pendant cette attente, l'exception
+    # remonte et le verrou est volontairement conservé : les workflows Temporal
+    # peuvent continuer même si ce processus local s'arrête.
+    results = await asyncio.gather(
+        *(handle.result() for handle in workflow_handles),
+        return_exceptions=True,
+    )
+    for handle, result in zip(workflow_handles, results):
+        if isinstance(result, BaseException):
+            failed_workflows.append(handle.id)
+            logger.error("❌ Workflow terminé en échec | ID: %s | %s", handle.id, result)
+        else:
+            logger.info("🏁 Workflow terminé | ID: %s", handle.id)
+
+    logger.info(
+        "📊 Résumé: %s prompt(s) scanné(s), %s workflow(s) terminé(s), %s échec(s)",
+        len(prompt_files), len(workflow_handles), len(failed_workflows),
+    )
+
+    # Le verrou n'est supprimé qu'après le retour normal de l'attente de TOUS
+    # les workflows. En cas d'interruption/annulation, cette ligne n'est pas atteinte.
+    lock_path = Path(lock_trigger_path)
+    try:
+        lock_path.unlink(missing_ok=True)
+        logger.info("🧹 Fichier lock_trigger supprimé après la fin de tous les workflows : %s", lock_path)
+    except OSError:
+        logger.exception("❌ Impossible de supprimer le fichier lock_trigger : %s", lock_path)
+
+    return 1 if failed_workflows else 0
 
 
 if __name__ == "__main__":

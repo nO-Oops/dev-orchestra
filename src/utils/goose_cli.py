@@ -1,5 +1,7 @@
 import re
 import asyncio
+import os
+import shutil
 # src/utils/goose_cli.py
 import json
 import logging
@@ -15,6 +17,50 @@ class GooseCLIError(Exception):
     def __init__(self, message: str = "", non_retryable: bool = False):
         self.non_retryable = non_retryable
         super().__init__(message)
+
+
+def resolve_goose_executable() -> str:
+    """Résout le binaire Goose, y compris dans les workers (PATH distinct).
+
+    Priorité : GOOSE_CLI_PATH (chemin absolu ou nom de commande), puis PATH.
+    La variable doit être définie dans l'environnement du worker ou dans le
+    fichier .env chargé au démarrage par src.config.
+    """
+    configured = os.environ.get("GOOSE_CLI_PATH", "").strip()
+
+    if configured:
+        configured_path = Path(configured).expanduser()
+        # Un chemin explicite (absolu ou contenant un séparateur) est vérifié
+        # directement ; un simple nom de commande est recherché dans PATH.
+        if configured_path.is_absolute() or os.sep in configured or (os.altsep and os.altsep in configured):
+            candidate = configured_path.resolve()
+            if candidate.is_file() and os.access(candidate, os.X_OK):
+                return str(candidate)
+            raise GooseCLIError(
+                "GOOSE_CLI_PATH est défini mais ne pointe pas vers un exécutable "
+                f"accessible : {candidate}. Vérifiez le chemin et les permissions.",
+                non_retryable=True,
+            )
+        resolved = shutil.which(configured)
+        if resolved:
+            return resolved
+        raise GooseCLIError(
+            f"GOOSE_CLI_PATH='{configured}' est défini, mais cette commande "
+            "est introuvable dans le PATH du worker Temporal.",
+            non_retryable=True,
+        )
+
+    resolved = shutil.which("goose")
+    if resolved:
+        return resolved
+
+    raise GooseCLIError(
+        "Goose CLI introuvable : le worker Temporal ne trouve pas l'exécutable 'goose'. "
+        "Installez Goose, puis définissez GOOSE_CLI_PATH dans le fichier .env "
+        "ou dans l'environnement du service (chemin absolu recommandé). "
+        "Installation officielle : https://github.com/block/goose",
+        non_retryable=True,
+    )
 
 
 def build_goose_log_path(base_dir: str, context: str, log_base: Optional[str] = None) -> str:
@@ -96,8 +142,9 @@ async def run_goose_command(
         recipes_dir = f"{_tooling_root}/.goose/recipes"
         recipe_path = f"{recipes_dir}/{recipe}"
 
+    goose_executable = resolve_goose_executable()
     cmd = [
-        "goose", "run",
+        goose_executable, "run",
         "--recipe", recipe_path,
         "--provider", provider,
         "--model", model,
@@ -331,14 +378,19 @@ async def run_goose_command(
         if log_file:
             error_msg += f"\n(Log complet disponible dans : {log_file})"
         logger.error(error_msg)
-        # En cas de timeout, on tue le processus
+        # Arrêter puis récolter le processus pour éviter un sous-processus orphelin.
         if process is not None and process.returncode is None:
-            process.terminate()
+            process.kill()
+            await process.wait()
         raise GooseCLIError(error_msg)
-    except FileNotFoundError:
-        error_msg = "goose CLI not found. Install it with: go install github.com/block/goose@latest"
+    except FileNotFoundError as exc:
+        error_msg = (
+            "Impossible de démarrer Goose CLI : l'exécutable configuré n'existe "
+            f"pas ou n'est pas accessible ({exc.filename!r}). Vérifiez GOOSE_CLI_PATH "
+            "et le PATH du worker Temporal."
+        )
         logger.error(error_msg)
-        raise GooseCLIError(error_msg)
+        raise GooseCLIError(error_msg, non_retryable=True) from exc
     finally:
         # Nettoyage garanti des tâches de streaming
         if stdout_task is not None and not stdout_task.done():

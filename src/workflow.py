@@ -43,8 +43,7 @@ class develop_feature_pipeline:
             start_to_close_timeout=timedelta(minutes=5),
         )
 
-    @workflow.run
-    async def develop_feature_pipeline(
+    async def _run_pipeline(
         self,
         feature_name: str,
         base_dir: str,
@@ -422,10 +421,31 @@ class develop_feature_pipeline:
 
         logger.info("=== Pipeline Completed Successfully ===")
 
-        # Check if lock_trigger exists before remove it
-        lock_trigger_position = str(Path().resolve().parent) + "/lock_trigger"
-        if os.path.isfile(lock_trigger_position):
-            os.remove(lock_trigger_position)  # Remove the file
-            logger.info(f"Deleted file: {lock_trigger_position}")
-        else:
-            logger.warning(f"File lock_trigger not found -> {lock_trigger_position}")
+    @workflow.run
+    async def develop_feature_pipeline(
+        self,
+        feature_name: str,
+        base_dir: str,
+        model: str = gc.model,
+        provider: str = gc.provider,
+        recipes_dir: str = "",
+        max_turns: str = "100",
+        display_goose_log: bool = True,
+    ):
+        """Exécute le pipeline d'une fonctionnalité.
+
+        Le verrou global n'est volontairement PAS supprimé ici : plusieurs
+        workflows peuvent être actifs simultanément et les activités peuvent
+        être rejouées selon leur RetryPolicy. Le déclencheur attendra la fin
+        définitive de tous les workflows avant de supprimer le verrou.
+        """
+        return await self._run_pipeline(
+            feature_name=feature_name,
+            base_dir=base_dir,
+            model=model,
+            provider=provider,
+            recipes_dir=recipes_dir,
+            max_turns=max_turns,
+            display_goose_log=display_goose_log,
+        )
+
